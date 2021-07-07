@@ -66,10 +66,23 @@ def get_link(dom, idx):
     return link
 
 
-def get_next_page(dom):
+def get_next_page(dom, tipo):
     try:
-        next_page = dom.xpath(f'/html/body/main/div[2]/div[1]/section/div[2]/div[2]/div/ul/li[9]/a/@href')[0]
+        if tipo == 'Casa':
+            next_page = dom.xpath(f'//*[@id="js-site-main"]/div[2]/div[1]/section/div[2]/div[2]/div/ul/li[8]/a/@href')[0]
+        elif tipo == 'Loteamento':
+            next_page = dom.xpath(f'//*[@id="js-site-main"]/div[2]/div[1]/section/div[2]/div[2]/div/ul/li[4]/a/@href')[0]
+        else:
+            next_page = dom.xpath(f'//*[@id="js-site-main"]/div[2]/div[1]/section/div[2]/div[2]/div/ul/li[9]/a/@href')[0]
+
     except:
-        next_page = ""
+        correto = False
+        n = 1
+        while not correto:
+            try:
+                next_page = dom.xpath(f'//*[@id="js-site-main"]/div[2]/div[1]/section/div[2]/div[2]/div/ul/li[{n}]/a/@href')[0]
+                correto = True
+            except:
+                n += 1
     
     return next_page
