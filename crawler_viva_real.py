@@ -2,7 +2,6 @@
 # Github - leonardodma
 
 # Imports Bibliotecas Básicas
-import types
 from numpy.lib.function_base import append
 import pandas as pd 
 import numpy as np
@@ -31,74 +30,34 @@ from fake_useragent import UserAgent
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 # Importe de Módulos
-from Parseador import *
+from parseadores.parseador_VivaReal import *
 
 
 class Crawler_VivaReal():
-    def __init__(self):
+    def __init__(self, web_driver):
         # Variável para guardar os dados coletados
-        self.all_data = {}
-
-        # Planilha selecionada 
-        print('SELECIONE A PLANILHA COM O LAUDO QUE VOCÊ ESTÁ COLHENDO OS DADOS')
-        self.laudo = str(self.get_file_path())
-        print(f'VOCÊ SELECIONOU O LAUDO: {self.laudo}')
-        
-        # Iniciando Softwares Necessários
-        # 1) Chrome Driver
-        chromedriver_path = Path(str(Path(__file__).parent.resolve()) + '\software\chromedriver_win32\chromedriver.exe')
-        options = Options()
-        options.add_argument("--window-size=1920x1800")
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        self.driver = webdriver.Chrome(executable_path = chromedriver_path, options=options)
+        self.data_viva_real = {}
+        self.driver = web_driver
 
         # 2) Dom Xpath
-        warnings.simplefilter('ignore',InsecureRequestWarning)
+        warnings.simplefilter('ignore', InsecureRequestWarning)
         self.ua = UserAgent()
 
-    
-    def get_file_path(self):
-        #path = str(r'R:\Empírica Cobranças e Garantias\5 - Avaliações de Imóveis\Projeto estágio de férias\vba.txt')
-        #print(f'O arquivo contendo o path do laudo é: {path}')
-
-        #file = open(path, encoding="ascii").read()
-
-        #return str(r'R:\Empírica Cobranças e Garantias\5 - Avaliações de Imóveis\Laudos Creditas\7.21\TESTE - ESTAGIO DE FÉRIAS - AUTOMATIZAÇÃO LAUDOS\07.21 - Maria José Pereira Dias.xlsm')
-
-        return easygui.fileopenbox()
-
-    def get_search_string(self):
-        # Give the location of the file
-
-        path = self.laudo
-        wb_obj = openpyxl.load_workbook(path, data_only=True)
-        self.ws = wb_obj['Modelo de Laudo']
-
-        bairro = self.ws['E23'].value.strip()
-        municipio = self.ws['E24'].value.strip()
-        tipo = self.ws['E27'].value.strip()
-
-
-        search_string = f'{bairro} - {municipio}'
-
-        return search_string, tipo
-
-
     def seleciona_tipo(self, tipo_imovel):
-        if tipo_imovel == "Apartamento":
+        # O que é imovel misto?
+        if tipo_imovel == "Apartamento" or tipo_imovel == "Apartamento Cobertura":
             self.driver.find_element_by_xpath('//*[@id="unit-type-APARTMENT|UnitSubType_NONE,DUPLEX,LOFT,STUDIO,TRIPLEX|RESIDENTIAL|APARTMENT"]').click()
-        elif tipo_imovel == "Casa":
+        elif tipo_imovel == "Casa Condomínio" or tipo_imovel == "Casa Residencial":
             self.driver.find_element_by_xpath('//*[@id="unit-type-HOME|UnitSubType_NONE,SINGLE_STOREY_HOUSE,VILLAGE_HOUSE,KITNET|RESIDENTIAL|HOME"]').click()
-        elif tipo_imovel == "Sala":
+        elif tipo_imovel == "Sala Comercial":
             self.driver.find_element_by_xpath('//*[@id="unit-type-OFFICE|UnitSubType_NONE,OFFICE,FLOOR|COMMERCIAL|OFFICE"]').click()
-        elif tipo_imovel == "Loja":
+        elif tipo_imovel == "Casa Comercial":
             self.driver.find_element_by_xpath('//*[@id="unit-type-HOME|UnitSubType_NONE|COMMERCIAL|COMMERCIAL_PROPERTY"]').click()
-        elif tipo_imovel == "Loteamento":
+        elif tipo_imovel == "Terreno":
             self.driver.find_element_by_xpath('//*[@id="unit-type-ALLOTMENT_LAND|UnitSubType_NONE,CONDOMINIUM,VILLAGE_HOUSE|RESIDENTIAL|RESIDENTIAL_ALLOTMENT_LAND"]').click()
 
 
-    def properties_url(self):
-        search_str, tipo_imovel = self.get_search_string()
+    def properties_url(self, search_str, tipo_imovel):
 
         self.driver.get('https://www.vivareal.com.br/venda/')
         edit_filters = self.driver.find_element_by_xpath('//*[@id="js-site-main"]/div[2]/div[1]/section/header/div/div/div[3]/div/button')
@@ -170,12 +129,10 @@ class Crawler_VivaReal():
         return qtd
 
 
-    def get_data(self):
-        main_URL = self.properties_url()
+    def get_data(self, search_str, tipo_imovel):
+        main_URL = self.properties_url(search_str, tipo_imovel)
         time.sleep(2)
         self.driver.quit()
-
-        tipo = self.get_search_string()[1]
 
         estados = []
         cidades = []
@@ -230,76 +187,24 @@ class Crawler_VivaReal():
                         precos.append(preco)
                         links.append(link)
 
-                next_page = get_next_page(dom, tipo)
+                next_page = get_next_page(dom, tipo_imovel)
 
                 if next_page == '#pagina=':
                     end = True
                     
             pagina += 1
 
-        self.all_data['Estado'] = estados
-        self.all_data['Cidade'] = cidades
-        self.all_data['Bairro'] = bairros
-        self.all_data['Endereço'] = enderecos
-        self.all_data['Área'] = areas
-        self.all_data['Quartos'] = quartos
-        self.all_data['Banheiros'] = banheiros
-        self.all_data['Preço'] = precos
-        self.all_data['Link'] = links
+        self.data_viva_real['Estado'] = estados
+        self.data_viva_real['Cidade'] = cidades
+        self.data_viva_real['Bairro'] = bairros
+        self.data_viva_real['Endereço'] = enderecos
+        self.data_viva_real['Área'] = areas
+        self.data_viva_real['Quartos'] = quartos
+        self.data_viva_real['Banheiros'] = banheiros
+        self.data_viva_real['Preço'] = precos
+        self.data_viva_real['Link'] = links
         
 
-    def remove_by_idx(self, idxs):
-        self.all_data['Estado'] = [i for n, i in enumerate(self.all_data['Estado']) if n not in idxs]
-        self.all_data['Cidade'] = [i for n, i in enumerate(self.all_data['Cidade']) if n not in idxs]
-        self.all_data['Bairro'] = [i for n, i in enumerate(self.all_data['Bairro']) if n not in idxs]
-        self.all_data['Endereço'] = [i for n, i in enumerate(self.all_data['Endereço']) if n not in idxs]
-        self.all_data['Área'] = [i for n, i in enumerate(self.all_data['Área']) if n not in idxs]
-        self.all_data['Quartos'] = [i for n, i in enumerate(self.all_data['Quartos']) if n not in idxs]
-        self.all_data['Banheiros'] = [i for n, i in enumerate(self.all_data['Banheiros']) if n not in idxs]
-        self.all_data['Preço'] = [i for n, i in enumerate(self.all_data['Preço']) if n not in idxs]
-        self.all_data['Link'] = [i for n, i in enumerate(self.all_data['Link']) if n not in idxs]
+        return self.data_viva_real
 
-
-    def filter_by_area(self):
-        area_imovel = self.ws['U34'].value
-        print(f'Área do imóvel analisado: {area_imovel}')
-
-        areas = self.all_data['Área']
-        array_areas = []
-        for area in areas:
-            try:
-                array_areas.append(int(area))
-            except:
-                x = int(area.split('-')[0].strip())
-                y = int(area.split('-')[0].strip())
-                array_areas.append((x+y)/2)
-
-        idx_remove = []
-
-        print('LIMPANDO IMÓVEIS PELA ÁREA')
-        for i in tqdm(range(len(array_areas))):
-            if array_areas[i] < area_imovel-20 or array_areas[i] > area_imovel+20:
-                idx_remove.append(i)
-        
-        return idx_remove
-
-
-    def clean_dataframe(self):
-        # Filtra Área
-        self.remove_by_idx(self.filter_by_area())
     
-
-    def save_dataframe(self):
-        file_path = self.laudo
-        barra = str(r" \ ")[1]
-        save_path = barra.join(file_path.split(barra)[0:-1])+barra+'dados_coletados.xlsx'
-        print(f'Salvando dados coletados em: {save_path}')
-        
-        pd.DataFrame.from_dict(self.all_data).to_excel(save_path, sheet_name='Sheet1')
-
-
-if __name__ == '__main__':
-    crawler = Crawler_VivaReal()
-    crawler.get_data()
-    crawler.clean_dataframe()
-    crawler.save_dataframe()
