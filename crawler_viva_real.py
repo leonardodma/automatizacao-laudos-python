@@ -10,6 +10,8 @@ import time
 import os, os.path
 from pathlib import Path
 import openpyxl
+import easygui
+from tqdm import tqdm
 
 # Imports Selenium (Navegador Web) - Obter Links dos imóveis 
 from selenium import webdriver
@@ -28,13 +30,20 @@ import warnings
 from fake_useragent import UserAgent
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-
 # Importe de Módulos
 from Parseador import *
 
 
 class Crawler_VivaReal():
     def __init__(self):
+        # Variável para guardar os dados coletados
+        self.all_data = {}
+
+        # Planilha selecionada 
+        print('SELECIONE A PLANILHA COM O LAUDO QUE VOCÊ ESTÁ COLHENDO OS DADOS')
+        self.laudo = str(self.get_file_path())
+        print(f'VOCÊ SELECIONOU O LAUDO: {self.laudo}')
+        
         # Iniciando Softwares Necessários
         # 1) Chrome Driver
         chromedriver_path = Path(str(Path(__file__).parent.resolve()) + '\software\chromedriver_win32\chromedriver.exe')
@@ -47,20 +56,28 @@ class Crawler_VivaReal():
         warnings.simplefilter('ignore',InsecureRequestWarning)
         self.ua = UserAgent()
 
-        # Variável para guardar os dados coletados
-        self.all_data = {}
+    
+    def get_file_path(self):
+        #path = str(r'R:\Empírica Cobranças e Garantias\5 - Avaliações de Imóveis\Projeto estágio de férias\vba.txt')
+        #print(f'O arquivo contendo o path do laudo é: {path}')
 
+        #file = open(path, encoding="ascii").read()
+
+        #return str(r'R:\Empírica Cobranças e Garantias\5 - Avaliações de Imóveis\Laudos Creditas\7.21\TESTE - ESTAGIO DE FÉRIAS - AUTOMATIZAÇÃO LAUDOS\07.21 - Maria José Pereira Dias.xlsm')
+
+        return easygui.fileopenbox()
 
     def get_search_string(self):
         # Give the location of the file
-        path = "modelo_laudo.xlsm"
+
+        path = self.laudo
         wb_obj = openpyxl.load_workbook(path, data_only=True)
         self.ws = wb_obj['Modelo de Laudo']
 
         bairro = self.ws['E23'].value.strip()
         municipio = self.ws['E24'].value.strip()
-        #tipo = self.ws['E27'].value.strip()
-        tipo = 'Casa'
+        tipo = self.ws['E27'].value.strip()
+
 
         search_string = f'{bairro} - {municipio}'
 
@@ -182,10 +199,10 @@ class Crawler_VivaReal():
 
             print(URL)
             session = requests.Session()
-            print('Sessão Iniciada')
+            #print('Sessão Iniciada')
             page = session.get(URL, headers={"User-Agent": str(self.ua.chrome)})
-            print('Conexão com o site feita com sucesso')
-            print('\n')
+            #print('Conexão com o site feita com sucesso')
+            #print('\n')
 
             if page.status_code == 200:
                 soup = BeautifulSoup(page.content, 'html.parser')
@@ -214,7 +231,7 @@ class Crawler_VivaReal():
                         links.append(link)
 
                 next_page = get_next_page(dom, tipo)
-                print(next_page)
+
                 if next_page == '#pagina=':
                     end = True
                     
@@ -258,7 +275,9 @@ class Crawler_VivaReal():
                 array_areas.append((x+y)/2)
 
         idx_remove = []
-        for i in range(len(array_areas)):
+
+        print('LIMPANDO IMÓVEIS PELA ÁREA')
+        for i in tqdm(range(len(array_areas))):
             if array_areas[i] < area_imovel-20 or array_areas[i] > area_imovel+20:
                 idx_remove.append(i)
         
@@ -271,7 +290,12 @@ class Crawler_VivaReal():
     
 
     def save_dataframe(self):
-        pd.DataFrame.from_dict(self.all_data).to_excel('imoveis_coletados.xlsx', sheet_name='Sheet1')
+        file_path = self.laudo
+        barra = str(r" \ ")[1]
+        save_path = barra.join(file_path.split(barra)[0:-1])+barra+'dados_coletados.xlsx'
+        print(f'Salvando dados coletados em: {save_path}')
+        
+        pd.DataFrame.from_dict(self.all_data).to_excel(save_path, sheet_name='Sheet1')
 
 
 if __name__ == '__main__':
