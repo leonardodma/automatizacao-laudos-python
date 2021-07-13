@@ -8,8 +8,6 @@ import numpy as np
 import time
 import os, os.path
 from pathlib import Path
-import openpyxl
-import easygui
 from tqdm import tqdm
 
 # Imports Selenium (Navegador Web) - Obter Links dos imóveis 
@@ -34,12 +32,14 @@ from parseadores.parseador_VivaReal import *
 
 
 class Crawler_VivaReal():
-    def __init__(self, web_driver):
+    def __init__(self, webdriver):
         # Variável para guardar os dados coletados
         self.data_viva_real = {}
-        self.driver = web_driver
 
-        # 2) Dom Xpath
+        # Chrome Driver
+        self.driver = webdriver
+
+        # Dom Xpath
         warnings.simplefilter('ignore', InsecureRequestWarning)
         self.ua = UserAgent()
 
@@ -132,9 +132,9 @@ class Crawler_VivaReal():
     def get_data(self, search_str, tipo_imovel):
         main_URL = self.properties_url(search_str, tipo_imovel)
         time.sleep(2)
-        self.driver.quit()
+        #self.driver.quit()
+        print('\n\n')
 
-        estados = []
         cidades = []
         bairros = []
         enderecos = []
@@ -150,16 +150,12 @@ class Crawler_VivaReal():
         while not end:
             if pagina == 0:
                 URL = main_URL
-                print('')
             else:
                 URL = main_URL+f'?pagina={pagina}'
 
             print(URL)
             session = requests.Session()
-            #print('Sessão Iniciada')
             page = session.get(URL, headers={"User-Agent": str(self.ua.chrome)})
-            #print('Conexão com o site feita com sucesso')
-            #print('\n')
 
             if page.status_code == 200:
                 soup = BeautifulSoup(page.content, 'html.parser')
@@ -168,7 +164,7 @@ class Crawler_VivaReal():
 
                 for i in range(1, qtd_anuncios):
                     # Extrações 
-                    estado, cidade, bairro, endereco = get_adress(dom, i)
+                    cidade, bairro, endereco = get_adress(dom, i)
                     area = get_area(dom, i)
                     quarto = get_quartos(dom, i)
                     banheiro = get_banheiros(dom, i)
@@ -177,7 +173,6 @@ class Crawler_VivaReal():
 
                     # Adicionando extrações à lista
                     if len(preco) > 0:
-                        estados.append(estado)
                         cidades.append(cidade)
                         bairros.append(bairro)
                         enderecos.append(endereco)
@@ -189,12 +184,11 @@ class Crawler_VivaReal():
 
                 next_page = get_next_page(dom, tipo_imovel)
 
-                if next_page == '#pagina=':
+                if next_page == '#pagina=' or next_page == '#pagina=6':
                     end = True
                     
             pagina += 1
 
-        self.data_viva_real['Estado'] = estados
         self.data_viva_real['Cidade'] = cidades
         self.data_viva_real['Bairro'] = bairros
         self.data_viva_real['Endereço'] = enderecos
@@ -206,5 +200,3 @@ class Crawler_VivaReal():
         
 
         return self.data_viva_real
-
-    

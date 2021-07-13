@@ -1,31 +1,46 @@
-from pathlib import Path
-from unidecode import unidecode
+from bs4 import BeautifulSoup
+import requests
+from fake_useragent import UserAgent
+import re
+import json
+from statistics import mean
 
-def concerta_str(string):
-    string.to
-    pass
+ua = UserAgent()
 
-def get_file():
-        path = str(r'R:\Empírica Cobranças e Garantias\5 - Avaliações de Imóveis\Projeto estágio de férias\vba.txt')
-        print(f'O arquivo contendo o path do laudo é: {path}')
-        print('\n')
+URL = 'https://www.zapimoveis.com.br/venda/apartamentos/sp+sao-paulo+zona-sul+sto-amaro/'
+session = requests.Session()
+page = session.get(URL, headers={"User-Agent": str(ua.chrome)})
+soup = str(BeautifulSoup(page.content, 'html.parser'))
 
-        file = str(r"R:\Empírica Cobranças e Garantias\5 - Avaliações de Imóveis")
+
+data = re.search(r'window.__INITIAL_STATE__=({.*})', soup).group(1)
+a = "".join(data.split(";")[0:-3])
+data = json.loads(a)['results']["listings"]
+#print(json.dumps(data, indent=4))
+
+
+for i in range(len(data)):
+    cidade = data[i]["link"]["data"]["city"]
+    print(cidade)
+
+    bairro = data[i]["link"]["data"]["neighborhood"]
+    print(bairro)
+
+    endereco = data[i]["link"]["data"]["street"]+', '+data[i]["link"]["data"]["streetNumber"]
+    print(endereco)
+
+    area = mean(list(map(int, data[i]["listing"]["usableAreas"])))
+    print(area)
+
+    banheiros = data[i]["listing"]["bathrooms"][0]
+    print(banheiros)
+
+    quartos = data[i]["listing"]["bedrooms"][0]
+    print(quartos)
+
+    preco = data[i]["listing"]["pricingInfo"]["price"]
+    print(preco)
     
-        #txt = Path(path).read_text()
-        with open(path, 'r') as f:
-            txt = unidecode(f.read())
-
-        print(txt)
-        print(txt.split(' '))
-        """
-        a = []
-        for i in range(0, len(txt.split(" "))):
-            a.append(txt.split(" ")[i].encode('latin1').decode('utf-8'))
-
-        print(a)
-        """
-        return None
-
-import easygui
-print(easygui.fileopenbox())
+    link = 'https://www.zapimoveis.com.br'+data[i]["listing"]["link"]
+    print(link)
+    
