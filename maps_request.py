@@ -38,9 +38,5 @@ def get_image(address):
     except:
         print('Não existe fotos desse imóvel no Google')
 
-ad1 = 'Avanida Brg. Faria Lima 1800, São Paulo'
-ad2 = 'Avanida Paulista 1811, São Paulo'
-ad3 = 'Oracle do Brasil Sistemas'
 #print(get_photoreference('140 George St, The Rocks NSW 2000, Austrália'))
 #print('\n\n')
-get_image(ad3)
