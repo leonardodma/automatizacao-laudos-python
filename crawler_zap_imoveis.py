@@ -8,7 +8,6 @@ import numpy as np
 import time
 import os, os.path
 from pathlib import Path
-from tqdm import tqdm
 import re
 import json
 from statistics import mean

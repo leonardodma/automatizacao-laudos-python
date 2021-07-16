@@ -10,7 +10,7 @@ import os, os.path
 from pathlib import Path
 import openpyxl
 import easygui
-from tqdm import tqdm
+
 
 # Imports Selenium (Navegador Web) - Obter Links dos imóveis 
 from selenium import webdriver
