@@ -3,7 +3,6 @@
 
 # Imports Bibliotecas Básicas
 from re import search
-import re
 from numpy.lib.function_base import append
 import pandas as pd 
 import numpy as np
@@ -13,7 +12,12 @@ import openpyxl
 import easygui
 from tqdm import tqdm
 
+# Imports Selenium (Navegador Web) - Obter Links dos imóveis 
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+
 # Importe de Módulos
+from crawler_casa_mineira import *
 from crawler_viva_real import *
 from crawler_zap_imoveis import *
 
@@ -75,9 +79,11 @@ class Crawler_Full():
     def get_data(self):
         search_string, tipo_imovel = self.get_search_string()
 
+        #crawler_casa_mineira = Crawler_CasaMineira(self.driver)
         crawler_viva_real = Crawler_VivaReal(self.driver)
         crawler_zap_imoveis = Crawler_ZapImoveis(self.driver)
 
+        #casa_mineira = crawler_casa_mineira.get_data(search_string, tipo_imovel)
         viva_real = crawler_viva_real.get_data(search_string, tipo_imovel)
         zap_imoveis = crawler_zap_imoveis.get_data(search_string, tipo_imovel)
 
@@ -85,6 +91,9 @@ class Crawler_Full():
 
 
     def clean_dataframe(self):
+        print('\n\n')
+        self.all_data.replace('', np.nan, inplace=True)
+
         area_imovel = self.ws['U34'].value
         print(f'Área do imóvel analisado: {area_imovel}')
 
@@ -92,12 +101,30 @@ class Crawler_Full():
         self.all_data = self.all_data[(self.all_data['Área'] < area_imovel+20) & 
                                       (self.all_data['Área'] > area_imovel-20)]
 
-        print('LIMPANDO ENDEREÇOS VAZIOS')
-        self.all_data['Endereço'].replace('', np.nan, inplace=True)
+        print('LIMPANDO ENDEREÇOS E PREÇOS VAZIOS')
+        self.all_data[['Endereço', 'Preço']].replace('', np.nan, inplace=True)
         self.all_data.dropna(subset=['Endereço'], inplace=True)
+        self.all_data.dropna(subset=['Preço'], inplace=True)
 
         print('LIMPANDO ITENS REPETIDOS')
-        self.all_data.drop_duplicates(subset=['Bairro', 'Endereço', 'Área', 'Preço'], keep='last')
+        drop_idx = []
+        cleaned_data = []
+
+        bairro = list(self.all_data['Bairro'])
+        endereco = list(self.all_data['Endereço'])
+        area = list(self.all_data['Área'])
+        preco = list(self.all_data['Preço'])
+
+        for i in range(len(bairro)):
+            row = [bairro[i], endereco[i], area[i], preco[i]]
+            if row not in cleaned_data:
+                cleaned_data.append(row)
+            else:
+                drop_idx.append(i)
+
+        print(drop_idx)
+
+        self.all_data.drop(self.all_data.index[drop_idx], inplace=True)
 
 
     def save_dataframe(self):

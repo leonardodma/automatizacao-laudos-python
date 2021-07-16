@@ -6,16 +6,18 @@ def get_adress(dom, idx):
             endereco = ""
             bairro = full_adress.split('-')[0].split(',')[0]
             cidade = full_adress.split('-')[0].split(',')[1][1:-1]
+            estado = full_adress.split('-')[1][1:]
         else:
             endereco = full_adress.split('-')[0][0:-1]
             bairro = full_adress.split('-')[1].split(',')[0][1:]
             cidade = full_adress.split('-')[1].split(',')[1][1:-1]
+            estado = full_adress.split('-')[2][1:]
         
-        return cidade, bairro, endereco
+        return estado, cidade, bairro, endereco
         
 
     except:
-        return "", "", ""
+        return "", "", "", ""
 
 
 def get_area(dom, idx):
@@ -26,7 +28,7 @@ def get_area(dom, idx):
         except:
             x = int(area.split('-')[0].strip())
             y = int(area.split('-')[1].strip())
-            return (x+y)/2
+            return int((x+y)/2)
     except:
         return 0
 
@@ -48,6 +50,15 @@ def get_banheiros(dom, idx):
         banheiros = ""
     
     return banheiros
+
+
+def get_vagas(dom, idx):
+    try:
+        vagas = dom.xpath(f'/html/body/main/div[2]/div[1]/section/div[2]/div[1]/div[{str(idx)}]/div/article/a/div/ul[1]/li[4]/span[1]')[0].text.strip()
+    except:
+        vagas = ""
+    
+    return vagas
 
 
 def get_preco(dom, idx):

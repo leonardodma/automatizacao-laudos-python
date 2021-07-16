@@ -107,7 +107,7 @@ class Crawler_VivaReal():
         finish_edit.click()
 
         # Retornar o URL com os imóveis 
-        time.sleep(2)
+        time.sleep(4)
 
 
         return self.driver.current_url
@@ -134,21 +134,22 @@ class Crawler_VivaReal():
         time.sleep(2)
         #self.driver.quit()
         print('\n\n')
-
+        estados = []
         cidades = []
         bairros = []
         enderecos = []
         areas = []
         quartos = []
         banheiros = [] 
+        vagas = []
         precos = []
         links = []
 
         end = False
-        pagina = 0
+        pagina = 1
 
         while not end:
-            if pagina == 0:
+            if pagina == 1:
                 URL = main_URL
             else:
                 URL = main_URL+f'?pagina={pagina}'
@@ -164,39 +165,43 @@ class Crawler_VivaReal():
 
                 for i in range(1, qtd_anuncios):
                     # Extrações 
-                    cidade, bairro, endereco = get_adress(dom, i)
+                    estado, cidade, bairro, endereco = get_adress(dom, i)
                     area = get_area(dom, i)
                     quarto = get_quartos(dom, i)
                     banheiro = get_banheiros(dom, i)
+                    vaga = get_vagas(dom, i)
                     preco = get_preco(dom, i)
                     link = 'https://www.vivareal.com.br' + get_link(dom, i)
 
                     # Adicionando extrações à lista
                     if len(preco) > 0:
+                        estados.append(estado)
                         cidades.append(cidade)
                         bairros.append(bairro)
                         enderecos.append(endereco)
                         areas.append(area)
                         quartos.append(quarto)
                         banheiros.append(banheiro)
+                        vagas.append(vaga)
                         precos.append(preco)
                         links.append(link)
 
                 next_page = get_next_page(dom, tipo_imovel)
 
-                if next_page == '#pagina=' or next_page == '#pagina=6':
+                if next_page == '#pagina=' or next_page == '#pagina=7':
                     end = True
                     
             pagina += 1
 
+        self.data_viva_real['Estado'] = estados
         self.data_viva_real['Cidade'] = cidades
         self.data_viva_real['Bairro'] = bairros
         self.data_viva_real['Endereço'] = enderecos
         self.data_viva_real['Área'] = areas
-        self.data_viva_real['Quartos'] = quartos
-        self.data_viva_real['Banheiros'] = banheiros
+        self.data_viva_real['Quarto'] = quartos
+        self.data_viva_real['Banheiro'] = banheiros
+        self.data_viva_real['Vaga'] = vagas
         self.data_viva_real['Preço'] = precos
         self.data_viva_real['Link'] = links
-        
 
         return self.data_viva_real

@@ -44,7 +44,6 @@ class Crawler_ZapImoveis():
         self.ua = UserAgent()
 
     def seleciona_tipo(self, tipo_imovel):
-        # O que é imovel misto?
         if tipo_imovel == "Apartamento":
             self.driver.find_element_by_xpath('//*[@id="l-select1"]/optgroup[2]/option[1]').click()
         elif tipo_imovel  == "Apartamento Cobertura":
@@ -124,13 +123,14 @@ class Crawler_ZapImoveis():
         time.sleep(2)
         self.driver.quit()
         print('\n\n')
-
+        estados = []
         cidades = []
         bairros = []
         enderecos = []
         areas = []
         quartos = []
-        banheiros = [] 
+        banheiros = []
+        vagas = [] 
         precos = []
         links = []
 
@@ -157,6 +157,7 @@ class Crawler_ZapImoveis():
 
                 for i in range(len(data)):
                     # Endereço
+                    estados.append(data[i]["listing"]["address"]["stateAcronym"])
                     cidades.append(data[i]["link"]["data"]["city"])
                     bairros.append(data[i]["link"]["data"]["neighborhood"])
 
@@ -171,20 +172,29 @@ class Crawler_ZapImoveis():
                         enderecos.append("")
                     
                     # Área
-                    areas.append(mean(list(map(int, data[i]["listing"]["usableAreas"]))))
+                    areas.append(int(mean(list(map(int, data[i]["listing"]["usableAreas"])))))
 
                     # Quartos
                     quarto = list(map(str, data[i]["listing"]["bedrooms"])) 
                     if len(quarto) > 0:
                         quartos.append("-".join(quarto))
                     elif len(quarto) == 0:
-                        quartos.append('0')
+                        quartos.append('')
                     else:
                         quartos.append(quartos[0])
 
                     # Banheiros
-                    banheiros.append(data[i]["listing"]["bathrooms"][0])
-
+                    try:
+                        banheiros.append(str(data[i]["listing"]["bathrooms"][0]))
+                    except:
+                        banheiros.append('0')
+                        
+                    # Vagas
+                    try:
+                        vagas.append(str(data[i]["listing"]["parkingSpaces"][0]))
+                    except:
+                        vagas.append('0')
+                    
                     # Preços
                     precos.append(data[i]["listing"]["pricingInfo"]["price"])
 
@@ -198,12 +208,14 @@ class Crawler_ZapImoveis():
             if pagina > 6:
                 end = True
 
+        self.data_zap_imoveis['Estado'] = estados
         self.data_zap_imoveis['Cidade'] = cidades
         self.data_zap_imoveis['Bairro'] = bairros
         self.data_zap_imoveis['Endereço'] = enderecos
         self.data_zap_imoveis['Área'] = areas
-        self.data_zap_imoveis['Quartos'] = quartos
-        self.data_zap_imoveis['Banheiros'] = banheiros
+        self.data_zap_imoveis['Quarto'] = quartos
+        self.data_zap_imoveis['Banheiro'] = banheiros
+        self.data_zap_imoveis['Vaga'] = vagas
         self.data_zap_imoveis['Preço'] = precos
         self.data_zap_imoveis['Link'] = links
 
