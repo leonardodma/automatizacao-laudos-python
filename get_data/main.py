@@ -9,7 +9,7 @@ import numpy as np
 import os, os.path
 from pathlib import Path
 import openpyxl
-import easygui
+import pathlib
 
 
 # Imports Selenium (Navegador Web) - Obter Links dos imóveis 
@@ -27,10 +27,9 @@ class Crawler_Full():
         # Variável para guardar os dados coletados
         self.all_data = None
 
-        # Planilha selecionada 
-        print('SELECIONE A PLANILHA COM O LAUDO QUE VOCÊ ESTÁ COLHENDO OS DADOS')
-        self.laudo = str(self.get_file_path())
-        print(f'VOCÊ SELECIONOU O LAUDO: {self.laudo}')
+        # Planilha
+        self.laudo = self.get_file_path()
+        print(f'LAUDO: {self.laudo}')
 
         # Chrome Driver
         chromedriver_path = Path(str(Path(__file__).parent.resolve()) + '\software\chromedriver_win32\chromedriver.exe')
@@ -41,14 +40,10 @@ class Crawler_Full():
 
     
     def get_file_path(self):
-        #path = str(r'R:\Empírica Cobranças e Garantias\5 - Avaliações de Imóveis\Projeto estágio de férias\vba.txt')
-        #print(f'O arquivo contendo o path do laudo é: {path}')
+        with open(str(pathlib.Path(__file__).parent.resolve())+str(r'\file.txt'), 'r') as f:
+            file = f.read().strip()
 
-        #file = open(path, encoding="ascii").read()
-
-        #return str(r'R:\Empírica Cobranças e Garantias\5 - Avaliações de Imóveis\Laudos Creditas\7.21\TESTE - ESTAGIO DE FÉRIAS - AUTOMATIZAÇÃO LAUDOS\07.21 - Maria José Pereira Dias.xlsm')
-
-        return easygui.fileopenbox()
+        return file
 
 
     def get_search_string(self):
