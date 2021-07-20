@@ -7,23 +7,18 @@ from fake_useragent import UserAgent
 from lxml import etree
 import pathlib
 from pathlib import Path
-import openpyxl
+
 
 ua = UserAgent()
 with open(str(pathlib.Path(__file__).parent.resolve())+str(r'\file.txt'), 'r') as f:
     dados = f.read().strip().split("\n")
-    file = dados[0]
-    amostra = dados[1]
-    tentativas = int(dados[2])
+    amostra = dados[0]
+    tentativas = int(dados[1])
+    endereco = dados[2]
+    bairro = dados[3]
 
 
 def get_address():
-    wb_obj = openpyxl.load_workbook(file, data_only=True)
-    ws = wb_obj['Pesquisa de Mercado']
-
-    endereco = ws['Q7'].value.strip()
-    bairro = ws['Q8'].value.strip()
-
     search_string = f'{endereco} {bairro}'.strip()
 
     return search_string
