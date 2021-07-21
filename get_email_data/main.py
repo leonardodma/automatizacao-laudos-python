@@ -109,7 +109,7 @@ def parse_informations(bodys_list):
     #dados['Observações'] = observacoes
 
     df = pd.DataFrame.from_dict(dados)
-    path = str(r'R:\Empírica Cobranças e Garantias\5 - Avaliações de Imóveis\Banco de Dados - Laudos') + str(r'\novos_laudos.xlsx')
+    path = str(r'R:\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis\Banco de Dados - Laudos') + str(r'\novos_laudos.xlsx')
     df.to_excel(path, sheet_name='Sheet1')
 
 
