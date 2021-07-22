@@ -27,9 +27,6 @@ class Crawler_Full():
         # Variável para guardar os dados coletados
         self.all_data = None
 
-        # Planilha
-        self.laudo = self.get_file_path()
-        print(f'LAUDO: {self.laudo}')
 
         # Chrome Driver
         chromedriver_path = Path(str(Path(__file__).parent.resolve()) + '\software\chromedriver_win32\chromedriver.exe')
@@ -38,27 +35,23 @@ class Crawler_Full():
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         self.driver = webdriver.Chrome(executable_path = chromedriver_path, options=options)
 
-    
-    def get_file_path(self):
-        with open(str(pathlib.Path(__file__).parent.resolve())+str(r'\file.txt'), 'r') as f:
-            file = f.read().strip()
 
-        return file
+        with open(str(pathlib.Path(__file__).parent.resolve())+str(r'\file.txt'), 'r') as f:
+            informations = f.read().split('\n')
+            self.file_path = informations[0]
+            self.bairro = informations[1]
+            self.municipio = informations[2]
+            self.tipo = informations[3]
+        
+        # Planilha
+        self.laudo = self.file_path
+        print(f'LAUDO: {self.laudo}')
 
 
     def get_search_string(self):
-        # Give the location of the file
-        path = self.laudo
-        wb_obj = openpyxl.load_workbook(path, data_only=True)
-        self.ws = wb_obj['Modelo de Laudo']
+        search_string = f'{self.bairro}, {self.municipio}'.strip()
 
-        bairro = self.ws['E23'].value.strip()
-        municipio = self.ws['E24'].value.strip()
-        tipo = self.ws['E27'].value.strip()
-
-        search_string = f'{bairro}, {municipio}'.strip()
-
-        return search_string, tipo
+        return search_string, self.tipo
 
 
     def merge_data(self, data_dict_list):
