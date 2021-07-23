@@ -42,6 +42,7 @@ class Crawler_Full():
             self.bairro = informations[1]
             self.municipio = informations[2]
             self.tipo = informations[3]
+            self.area = int(informations[4])
         
         # Planilha
         self.laudo = self.file_path
@@ -82,7 +83,7 @@ class Crawler_Full():
         print('\n\n')
         self.all_data.replace('', np.nan, inplace=True)
 
-        area_imovel = self.ws['U34'].value
+        area_imovel = self.area
         print(f'Área do imóvel analisado: {area_imovel}')
 
         print('LIMPANDO IMÓVEIS PELA ÁREA')

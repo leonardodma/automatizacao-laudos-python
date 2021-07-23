@@ -25,13 +25,18 @@ def get_informatios():
     addresses = []
 
     with open(current_path+str(r'\file.txt'), 'r') as f:
+        barra = str(r' \ ')[1]
         informations = f.read().split('\n')[:-1]
-        laudo_path = informations[0]
+        laudo_path = barra.join(informations[0].split(barra)[:-1])
         imovel = informations[1] + ', Brazil'
         
         for i in range(2, len(informations)):
             x = informations[i].split(',')
-            address = " ".join([x[0].strip(), x[1].strip()]) + ', ' + x[2] + ', ' + x[3] + ', Brazil' 
+            try:
+                address = " ".join([x[0].strip(), x[1].strip()]) + ', ' + x[2] + ', ' + x[3] + ', Brazil' 
+            except:
+                address = x[0].strip() + x[1] + x[2] + ', Brazil' 
+
             addresses.append(address)
 
     
@@ -41,7 +46,7 @@ def get_informatios():
 laudo_path, imovel, addresses = get_informatios()
 
 
-def get_coordinates(addresses):
+def get_coordinates():
     coordinates = []
 
     for i in range(len(addresses)):
@@ -81,7 +86,12 @@ def export_map_png():
     html_file = current_path + str(r"\map.html")
     driver.get("file:///" + html_file)
     time.sleep(4)
-    driver.get_screenshot_as_file(current_path+str(r'\map.png'))
+
+    folder = laudo_path+str(r'\img')
+    Path(folder).mkdir(parents=True, exist_ok=True)
+    path = folder + r'\map.png'
+
+    driver.get_screenshot_as_file(path)
     driver.quit()
 
 
