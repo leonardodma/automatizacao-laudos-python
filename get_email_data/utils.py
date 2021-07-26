@@ -1,6 +1,10 @@
+from os import name
+import os
 import requests
 import json
 from credentials import MAPS_TOKEN
+import wikipedia
+wikipedia.set_lang("pt")
 
 
 def get_bairro(cep):
@@ -17,4 +21,19 @@ def get_bairro(cep):
     return result['formatted_address'].split(',')[0]
 
 
-#print(bairro('5415011'))
+def get_obs(bairro, cidade):
+    obs = wikipedia.summary(f"{bairro} - Bairro de {cidade}").split("\n")
+    print(obs)
+    print('\n\n')
+    print(obs[0].split('.'))
+    print('\n\n')
+    if len(obs) > 1:
+        if len(obs[0].split('.')) > 2:
+            return obs[0]
+        else:
+            return obs[0] + ' ' + obs[1]
+    else:
+        return obs[0]
+        
+
+print(get_obs('Jardim Ingá', 'São Paulo'))

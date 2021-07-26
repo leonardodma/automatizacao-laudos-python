@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from nylas import APIClient
 from requests.api import patch
 from credentials import CLIENT_ID, CLIENT_SECRET, ACCESS_TOKEN
-from maps import get_bairro
+from utils import *
 
 nylas = APIClient(
     CLIENT_ID,
@@ -58,6 +58,16 @@ def get_text(soup):
     return text
 
 
+def transform_string(string):
+    a = string.split(" ")
+    words = []
+
+    for word in a:
+        words.append(word[0]+word[1:].lower())
+    
+    return " ".join(words)
+
+
 def parse_informations(bodys_list):
     lead = []
     nome = []
@@ -81,15 +91,31 @@ def parse_informations(bodys_list):
             for i in range(len(splited_text)):
                 if splited_text[i] == 'Lead ID:':
                     lead.append(splited_text[i+1])
-                    nome.append(splited_text[i+3])
-                    tipologia.append(splited_text[i+5])
-                    endereco.append(splited_text[i+7].split(',')[0])
-                    numero.append(splited_text[i+7].split(',')[1].split('-')[0])
-                    complemento.append(splited_text[i+7].split(',')[1].split('-')[1])
-                    municipio.append(splited_text[i+9])
+                    nome.append(transform_string(splited_text[i+3]))
+                    tipologia.append(transform_string(splited_text[i+5]))
+
+                    endereco_completo = splited_text[i+7]
+                    print(endereco_completo)
+                    try:
+                        endereco.append(transform_string(endereco_completo.split(',')[0]))
+                        numero.append(endereco_completo.split(',')[1].split('-')[0])
+                        complemento.append(transform_string(endereco_completo[i+7].split(',')[1].split('-')[1]))
+                    except:
+                        endereco.pop(-1)
+                        endereco.append(transform_string(endereco_completo.split(' ')[0] +' '+ endereco_completo.split(' ')[1]))
+                        numero.append(endereco_completo.split(' ')[2][:-1])
+                        complemento.append("")
+
+                    municipio.append(transform_string(splited_text[i+9]))
                     uf.append(splited_text[i+11])
                     cep.append(splited_text[i+13])
-                    bairro.append(get_bairro(splited_text[i+13])) # cep
+
+                    x = transform_string(get_bairro(splited_text[i+13]))
+                    bairro.append(x) # cep
+
+
+                    observacoes.append(get_obs(x, transform_string(splited_text[i+9])))
+                    
                     #observacoes.append(splited_text[i+15])
     else:
         print('Não há novos email para serem extraidos')
@@ -106,10 +132,10 @@ def parse_informations(bodys_list):
     dados['UF'] = uf
     dados['Tipo'] = tipologia
     dados['Lead ID'] = lead
-    #dados['Observações'] = observacoes
+    dados['Observações'] = observacoes
 
     df = pd.DataFrame.from_dict(dados)
-    path = str(r'R:\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis\Banco de Dados - Laudos') + str(r'\novos_laudos.xlsx')
+    path = str(r'R:\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis\Laudos Creditas') + str(r'\novos_laudos.xlsx')
     df.to_excel(path, sheet_name='Sheet1')
 
 
