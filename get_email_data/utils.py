@@ -22,18 +22,18 @@ def get_bairro(cep):
 
 
 def get_obs(bairro, cidade):
-    obs = wikipedia.summary(f"{bairro} - Bairro de {cidade}").split("\n")
-    print(obs)
-    print('\n\n')
-    print(obs[0].split('.'))
-    print('\n\n')
-    if len(obs) > 1:
-        if len(obs[0].split('.')) > 2:
-            return obs[0]
+    try:
+        obs = wikipedia.summary(f"{bairro} - Bairro de {cidade}").split("\n")
+
+        if len(obs) > 1:
+            if len(obs[0].split('.')) > 2:
+                return obs[0]
+            else:
+                return obs[0] + ' ' + obs[1]
         else:
-            return obs[0] + ' ' + obs[1]
-    else:
-        return obs[0]
+            return obs[0]
+    except:
+        return 'Não foi encontrado nada sobre esse bairro no Wikpedia'
         
 
-print(get_obs('Jardim Ingá', 'São Paulo'))
+#print(get_obs('Jardim Ingá', 'São Paulo'))
