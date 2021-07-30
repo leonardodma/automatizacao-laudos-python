@@ -21,13 +21,27 @@ geolocator = GoogleV3(api_key=MAPS_TOKEN)
 current_path = str(Path(__file__).parent.resolve())
 
 
+def get_save_path(laudo_path):
+    planilha = laudo_path.split('/')
+    barra = str(r" \ ")[1]
+    pyhon_file_path = str(Path(__file__).parent.resolve()).split(barra)
+    user_path = barra.join(pyhon_file_path[:3])
+    img_path = barra + barra.join(planilha[8:-1]) + barra + 'img'
+    file_name = f'\\map.png'
+
+    save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path + file_name
+    folder = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path
+
+    return save_path, folder 
+
+
 def get_informatios():
     addresses = []
 
     with open(current_path+str(r'\file.txt'), 'r') as f:
-        barra = str(r' \ ')[1]
         informations = f.read().split('\n')[:-1]
-        laudo_path = barra.join(informations[0].split(barra)[:-1])
+        laudo_path = informations[0]
+        save_path, folder = get_save_path(laudo_path)
         imovel = informations[1] + ', Brazil'
         
         for i in range(2, len(informations)):
@@ -40,13 +54,13 @@ def get_informatios():
             addresses.append(address)
 
     
-    return laudo_path, imovel, addresses
+    return save_path, folder, imovel, addresses
 
 
-laudo_path, imovel, addresses = get_informatios()
+save_path, folder, imovel, addresses = get_informatios()
 
 
-def get_coordinates():
+def get_coordinates(addresses):
     coordinates = []
 
     for i in range(len(addresses)):
@@ -87,11 +101,9 @@ def export_map_png():
     driver.get("file:///" + html_file)
     time.sleep(4)
 
-    folder = laudo_path+str(r'\img')
     Path(folder).mkdir(parents=True, exist_ok=True)
-    path = folder + r'\map.png'
 
-    driver.get_screenshot_as_file(path)
+    driver.get_screenshot_as_file(save_path)
     driver.quit()
 
 

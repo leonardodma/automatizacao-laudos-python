@@ -13,11 +13,25 @@ ua = UserAgent()
 barra = str(r' \ ')[1]
 with open(str(pathlib.Path(__file__).parent.resolve())+str(r'\file.txt'), 'r') as f:
     dados = f.read().strip().split("\n")
-    laudo_path = barra.join(dados[0].split(barra)[:-1])
+    laudo_path = dados[0]
     amostra = dados[1]
     tentativas = int(dados[2])
     endereco = dados[3]
     bairro = dados[4]
+
+
+def save_path():
+    planilha = laudo_path.split('/')
+    barra = str(r" \ ")[1]
+    pyhon_file_path = str(Path(__file__).parent.resolve()).split(barra)
+    user_path = barra.join(pyhon_file_path[:3])
+    img_path = barra + barra.join(planilha[8:-1]) + barra + 'img'
+    file_name = f'\\amostra{amostra}.png'
+
+    save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path + file_name
+    folder = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path
+
+    return save_path, folder 
 
 
 def get_address():
@@ -46,9 +60,8 @@ def get_dom(url):
 
 
 def download_image(src):
-    folder = laudo_path+str(r'\img')
+    path, folder = save_path()
     Path(folder).mkdir(parents=True, exist_ok=True)
-    path = folder + f'\\amostra{amostra}.png'
     print('Imagem salva em:')
     print(path)
     f = open(path,'wb')
@@ -59,7 +72,7 @@ def download_image(src):
 def get_image(tentativas):
     url = get_url(get_address())
     dom = get_dom(url)
-    xpath = ".//img[contains(@class, 't0fcAb')]"
+    xpath = ".//img[contains(@class, 'yWs4tf')]"
     src = dom.xpath(xpath)[tentativas].items()[2][1]
     download_image(src)
 

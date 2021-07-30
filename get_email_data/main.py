@@ -72,7 +72,7 @@ def parse_informations(bodys_list):
                         complemento.append("")
 
                     municipio.append(transform_string(splited_text[i+9]))
-                    uf.append(splited_text[i+11])
+                    uf.append(transform_string(splited_text[i+11], keep=True))
                     cep.append(splited_text[i+13])
 
                     x = get_bairro(splited_text[i+13])

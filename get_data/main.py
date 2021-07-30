@@ -45,6 +45,7 @@ class Crawler_Full():
             self.area = int(informations[4])
         
         # Planilha
+        
         self.laudo = self.file_path
         print(f'LAUDO: {self.laudo}')
 
@@ -117,9 +118,15 @@ class Crawler_Full():
 
 
     def save_dataframe(self):
-        file_path = self.laudo
+        planilha = self.laudo.split('/')
         barra = str(r" \ ")[1]
-        save_path = barra.join(file_path.split(barra)[0:-1])+barra+'dados_coletados.xlsx'
+        pyhon_file_path = str(Path(__file__).parent.resolve()).split(barra)
+        user_path = barra.join(pyhon_file_path[:3])
+        planilha_path = barra + barra.join(planilha[8:-1])
+        file_name = r'\dados_coletados.xlsx'
+
+        save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + planilha_path + file_name
+
         print('\n')
         print(f'Dados coletados foram salvos em: {save_path}')
         
