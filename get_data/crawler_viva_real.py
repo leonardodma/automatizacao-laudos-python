@@ -76,28 +76,28 @@ class Crawler_VivaReal():
         search_box.send_keys(search_str)
         
         # Esperar tempo para aparecer as sugestões
-        time.sleep(3)
+        time.sleep(5)
 
         # Selecionar a primeira sugestão 
         search_box.send_keys(Keys.RETURN)
 
         # Filtrar tipo de imóvel (Apartamento, Casa, Sala, Loja, Loteamento)
         # 1) Clicar em "mostrar todos"
-        time.sleep(1)
+        time.sleep(2)
         mostrar_todos = self.driver.find_element_by_xpath('//*[@id="js-site-main"]/div[2]/div[1]/nav/div/div/form/fieldset[1]/div[3]/div')
         mostrar_todos.click()
 
         # 2) Ajuste à janela de seleção do tipo de imóvel
-        time.sleep(1)
+        time.sleep(2)
         janela_selecao = self.driver.find_element_by_xpath('//*[@id="js-site-main"]/div[2]/div[1]/nav/div/div/form/fieldset[1]/div[3]/div/div/div')
         self.driver.execute_script("arguments[0].scrollIntoView();", janela_selecao)
 
         # 3) Selecionar Tipo de Imóvel
-        time.sleep(1)
+        time.sleep(2)
         self.seleciona_tipo(tipo_imovel)
 
         # 4) Reajustar à "mostrar todos" novamente
-        time.sleep(1)
+        time.sleep(2)
         self.driver.execute_script("arguments[0].scrollIntoView();", mostrar_todos)
         mostrar_todos.click()
         
@@ -107,7 +107,7 @@ class Crawler_VivaReal():
         finish_edit.click()
 
         # Retornar o URL com os imóveis 
-        time.sleep(4)
+        time.sleep(7)
 
 
         return self.driver.current_url
@@ -186,9 +186,9 @@ class Crawler_VivaReal():
                         precos.append(preco)
                         links.append(link)
 
-                next_page = get_next_page(dom, tipo_imovel)
-
-                if next_page == '#pagina=' or next_page == '#pagina=7':
+                #next_page = get_next_page(dom, tipo_imovel)
+                #print(next_page)
+                if pagina > 5:
                     end = True
                     
             pagina += 1

@@ -87,7 +87,7 @@ class Crawler_ZapImoveis():
 
         barra = str(r' / ')[1]
 
-        time.sleep(4)
+        time.sleep(7)
         url = self.driver.current_url
 
         return barra.join(url.split(barra)[0:6])

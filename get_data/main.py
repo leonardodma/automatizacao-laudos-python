@@ -64,6 +64,7 @@ class Crawler_Full():
             frames.append(df)
 
         self.all_data = pd.concat(frames)
+        #self.all_data.to_excel('all_data.xlsx', sheet_name='Sheet1')
 
 
     def get_data(self):
@@ -88,8 +89,8 @@ class Crawler_Full():
         print(f'Área do imóvel analisado: {area_imovel}')
 
         print('LIMPANDO IMÓVEIS PELA ÁREA')
-        self.all_data = self.all_data[(self.all_data['Área'] < area_imovel+20) & 
-                                      (self.all_data['Área'] > area_imovel-20)]
+        self.all_data = self.all_data[self.all_data['Área'] < area_imovel+20]
+        self.all_data = self.all_data[self.all_data['Área'] > area_imovel-20]
 
         print('LIMPANDO ENDEREÇOS E PREÇOS VAZIOS')
         self.all_data[['Endereço', 'Preço']].replace('', np.nan, inplace=True)

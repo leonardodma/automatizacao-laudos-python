@@ -79,18 +79,53 @@ def get_main_location():
     return (x.latitude, x.longitude)
 
 
+def split_duplicates(addresses_dict):
+    duplicates = []
+    chaves = []
+    valores = []
+
+    for chave, valor in addresses_dict.items():
+        if valor not in valores:
+            valores.append(valor)
+        else:
+            chaves.append(chave)
+    
+    for chave, valor in addresses_dict.items():
+        if chave in chaves:
+            duplicates.append(valor)
+
+    return duplicates
+
+
 def export_map_html():
+    all_coordinates = {}
+    all_coordinates['local'] = get_main_location()
+
     coordinates =  get_coordinates(addresses)
-    m = folium.Map(get_main_location())
+    for i in range(len(coordinates)):
+        all_coordinates[str(i+1)] = coordinates[i]
+
+
+    duplicates = split_duplicates(all_coordinates)
+
+
+    marker_cluster = MarkerCluster()
+
+    m = folium.Map(all_coordinates['local'])
     folium.Marker(location=get_main_location(), tooltip = imovel, icon=folium.Icon(color='red', icon='fas fa-home', prefix='fa')).add_to(m)
 
     n = 1
     for point in coordinates:
         icon_path = current_path+f'\\icons\\number-{n}.png'
         icon = folium.CustomIcon(icon_image=icon_path, icon_size=30)
-        folium.Marker(location=point, tooltip = n, icon=icon).add_to(m)
+        if point in duplicates:
+            folium.Marker(location=point, tooltip = n, icon=icon).add_to(marker_cluster)
+        else:
+            folium.Marker(location=point, tooltip = n, icon=icon).add_to(m)
+
         n += 1
 
+    marker_cluster.add_to(m)
     m.fit_bounds(m.get_bounds())
     m.save(current_path+str(r'\map.html'))
 
@@ -103,6 +138,7 @@ def export_map_png():
 
     Path(folder).mkdir(parents=True, exist_ok=True)
 
+    input('APERTE ENTER PARA FINALIZAR O PRINT: ')
     driver.get_screenshot_as_file(save_path)
     driver.quit()
 
