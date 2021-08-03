@@ -3,7 +3,7 @@
 
 # Imports Bibliotecas Básicas
 from re import search
-from numpy.lib.function_base import append
+from numpy.lib.function_base import append, copy
 import pandas as pd 
 import numpy as np
 import os, os.path
@@ -42,10 +42,13 @@ class Crawler_Full():
             self.bairro = informations[1]
             self.municipio = informations[2]
             self.tipo = informations[3]
-            self.area = int(informations[4])
+
+            try:
+                self.area = int(informations[4])
+            except:
+                self.area = int(float(".".join(informations[4].split(","))))
         
         # Planilha
-        
         self.laudo = self.file_path
         print(f'LAUDO: {self.laudo}')
 
@@ -64,7 +67,8 @@ class Crawler_Full():
             frames.append(df)
 
         self.all_data = pd.concat(frames)
-        #self.all_data.to_excel('all_data.xlsx', sheet_name='Sheet1')
+        self.all_data.to_excel(str(pathlib.Path(__file__).parent.resolve())+str(r'\all_data.xlsx'))
+
 
 
     def get_data(self):
@@ -79,7 +83,7 @@ class Crawler_Full():
         zap_imoveis = crawler_zap_imoveis.get_data(search_string, tipo_imovel)
 
         self.merge_data([viva_real, zap_imoveis])
-
+    
 
     def clean_dataframe(self):
         print('\n\n')
@@ -89,18 +93,12 @@ class Crawler_Full():
         print(f'Área do imóvel analisado: {area_imovel}')
 
         print('LIMPANDO IMÓVEIS PELA ÁREA')
-        self.all_data = self.all_data[self.all_data['Área'] < area_imovel+20]
-        self.all_data = self.all_data[self.all_data['Área'] > area_imovel-20]
-
-        print('LIMPANDO ENDEREÇOS E PREÇOS VAZIOS')
-        self.all_data[['Endereço', 'Preço']].replace('', np.nan, inplace=True)
-        self.all_data.dropna(subset=['Endereço'], inplace=True)
-        self.all_data.dropna(subset=['Preço'], inplace=True)
+        self.all_data = self.all_data[self.all_data['Área'] < area_imovel + area_imovel*0.4]
+        self.all_data = self.all_data[self.all_data['Área'] > area_imovel - area_imovel*0.4]
 
         print('LIMPANDO ITENS REPETIDOS')
         drop_idx = []
         cleaned_data = []
-
         bairro = list(self.all_data['Bairro'])
         endereco = list(self.all_data['Endereço'])
         area = list(self.all_data['Área'])
@@ -114,8 +112,17 @@ class Crawler_Full():
                 drop_idx.append(i)
 
         print(drop_idx)
-
         self.all_data.drop(self.all_data.index[drop_idx], inplace=True)
+
+        cleaned_df = pd.DataFrame.copy(self.all_data)
+        cleaned_df.dropna(subset=['Endereço'], inplace=True)
+        cleaned_df.dropna(subset=['Preço'], inplace=True)
+        
+        if len(cleaned_df.index) > 8:
+            print('LIMPANDO ENDEREÇOS E PREÇOS VAZIOS')
+            self.all_data = cleaned_df
+        else:
+            print('Tem menos de oito itens Salvando itens sem endereço também' )
 
 
     def save_dataframe(self):
