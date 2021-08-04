@@ -1,5 +1,6 @@
 # Imports 
 from folium.map import Marker
+from numpy import number
 from credentials import MAPS_TOKEN
 from geopy import GoogleV3
 import folium
@@ -29,8 +30,13 @@ def get_save_path(laudo_path):
     img_path = barra + barra.join(planilha[8:-1]) + barra + 'img'
     file_name = f'\\map.png'
 
-    save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path + file_name
-    folder = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path
+    if img_path == str(r'\\img'):
+        save_path = barra.join(laudo_path.split(barra)[:-1]) + '\img' + file_name
+        folder = barra.join(laudo_path.split(barra)[:-1]) + '\img'
+    else:
+        save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path + file_name
+        folder = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path
+
 
     return save_path, folder 
 
@@ -79,40 +85,19 @@ def get_main_location():
     return (x.latitude, x.longitude)
 
 
-def split_duplicates(addresses_dict):
-    duplicates = []
-    chaves = []
-    valores = []
-
-    for chave, valor in addresses_dict.items():
-        if valor not in valores:
-            valores.append(valor)
-        else:
-            chaves.append(chave)
-    
-    for chave, valor in addresses_dict.items():
-        if chave in chaves:
-            duplicates.append(valor)
-
-    return duplicates
+def split_duplicates(addresses):
+    l = addresses
+    return list(set([x for x in l if l.count(x) > 1]))
 
 
 def export_map_html():
-    all_coordinates = {}
-    all_coordinates['local'] = get_main_location()
-
     coordinates =  get_coordinates(addresses)
-    for i in range(len(coordinates)):
-        all_coordinates[str(i+1)] = coordinates[i]
+    duplicates = split_duplicates(coordinates)
+    print(f'Itens duplicados: {duplicates}')
 
-
-    duplicates = split_duplicates(all_coordinates)
-
-
-    marker_cluster = MarkerCluster()
-
-    m = folium.Map(all_coordinates['local'])
+    m = folium.Map(get_main_location())
     folium.Marker(location=get_main_location(), tooltip = imovel, icon=folium.Icon(color='red', icon='fas fa-home', prefix='fa')).add_to(m)
+    marker_cluster = MarkerCluster()
 
     n = 1
     for point in coordinates:
@@ -124,7 +109,7 @@ def export_map_html():
             folium.Marker(location=point, tooltip = n, icon=icon).add_to(m)
 
         n += 1
-
+        
     marker_cluster.add_to(m)
     m.fit_bounds(m.get_bounds())
     m.save(current_path+str(r'\map.html'))

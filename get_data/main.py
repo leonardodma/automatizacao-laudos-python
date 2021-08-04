@@ -133,7 +133,10 @@ class Crawler_Full():
         planilha_path = barra + barra.join(planilha[8:-1])
         file_name = r'\dados_coletados.xlsx'
 
-        save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + planilha_path + file_name
+        if planilha_path == barra:
+            save_path = barra.join(self.laudo.split(barra)[:-1]) + file_name
+        else:
+            save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + planilha_path + file_name
 
         print('\n')
         print(f'Dados coletados foram salvos em: {save_path}')

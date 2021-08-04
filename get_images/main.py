@@ -28,8 +28,12 @@ def save_path():
     img_path = barra + barra.join(planilha[8:-1]) + barra + 'img'
     file_name = f'\\amostra{amostra}.png'
 
-    save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path + file_name
-    folder = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path
+    if img_path == str(r'\\img'):
+        save_path = barra.join(laudo_path.split(barra)[:-1]) + '\img' + file_name
+        folder = barra.join(laudo_path.split(barra)[:-1]) + '\img'
+    else:
+        save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path + file_name
+        folder = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path
 
     return save_path, folder 
 
