@@ -141,6 +141,7 @@ class Crawler_Full():
         print('\n')
         print(f'Dados coletados foram salvos em: {save_path}')
         
+        self.all_data = self.all_data.iloc[(self.all_data['Área']-self.area).abs().argsort()]
         self.all_data.reset_index(drop=True, inplace=True)
         self.all_data.to_excel(save_path, sheet_name='Sheet1')
 

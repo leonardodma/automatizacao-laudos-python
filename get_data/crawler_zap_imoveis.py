@@ -71,7 +71,7 @@ class Crawler_ZapImoveis():
         search_box.send_keys(search_str)
 
         # Esperar tempo para aparecer as sugestões
-        time.sleep(3)
+        time.sleep(8)
 
         # Selecionar a primeira sugestão 
         search_box.send_keys(Keys.RETURN)

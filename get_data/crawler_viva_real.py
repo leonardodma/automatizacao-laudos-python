@@ -76,7 +76,7 @@ class Crawler_VivaReal():
         search_box.send_keys(search_str)
         
         # Esperar tempo para aparecer as sugestões
-        time.sleep(5)
+        time.sleep(8)
 
         # Selecionar a primeira sugestão 
         search_box.send_keys(Keys.RETURN)
