@@ -1,7 +1,8 @@
-C:\Users\labreu\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis\Laudos Creditas\Modelo Creditas V4 - Leonardo.xlsm
+https://empirica.sharepoint.com/sites/Dados/Documentos Compartilhados/Empirica Cobrancas e Garantias/5 - Avaliacoes de Imoveis/Laudos Creditas/8.21/Demonstração/Modelo Creditas V4 - Leonardo.xlsm
 Rua Antonio Carlos 690, Consolação, São Paulo
-Rua Frei Caneca, 444, Consolação, São Paulo
-Rua da Consolação, 328, Consolação, São Paulo
-Rua Dona Antônia de Queirós, Consolação, São Paulo
-Rua Marquês de Paranaguá, 36, Consolação, São Paulo
-Rua Bela Cintra, 521, Consolação, São Paulo
+Rua Bela Cintra, 0, Consolação, São Paulo
+Rua Caio Prado, 0, Consolação, São Paulo
+Rua Caio Prado, 363, Consolação, São Paulo
+Rua Antônio Carlos, 0, Consolação, São Paulo
+Rua Augusta, 150, Consolação, São Paulo
+Rua Augusta, 180, Consolação, São Paulo

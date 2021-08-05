@@ -188,7 +188,7 @@ class Crawler_VivaReal():
 
                 #next_page = get_next_page(dom, tipo_imovel)
                 #print(next_page)
-                if pagina > 5:
+                if pagina > 7:
                     end = True
                     
             pagina += 1

@@ -124,6 +124,19 @@ class Crawler_Full():
         else:
             print('Tem menos de oito itens Salvando itens sem endereço também' )
 
+    
+    def valor_unitario(self):
+        precos = list(self.all_data['Preço'])
+        areas = list(self.all_data['Área'])
+        
+        valor_unitario = []
+        for i in range(len(precos)):
+            num = int("".join(precos[i].strip()[2:].split('.')))
+            value = float(f'{num/areas[i]:.2f}')
+            valor_unitario.append(value)
+        
+        return valor_unitario
+
 
     def save_dataframe(self):
         planilha = self.laudo.split('/')
@@ -141,7 +154,8 @@ class Crawler_Full():
         print('\n')
         print(f'Dados coletados foram salvos em: {save_path}')
         
-        self.all_data = self.all_data.iloc[(self.all_data['Área']-self.area).abs().argsort()]
+        self.all_data['Valor unitário (R$/m²)'] =  self.valor_unitario()
+        self.all_data = self.all_data.sort_values(by=['Valor unitário (R$/m²)'])
         self.all_data.reset_index(drop=True, inplace=True)
         self.all_data.to_excel(save_path, sheet_name='Sheet1')
 
