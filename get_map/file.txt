@@ -1,8 +1,8 @@
-https://empirica.sharepoint.com/sites/Dados/Documentos Compartilhados/Empirica Cobrancas e Garantias/5 - Avaliacoes de Imoveis/Laudos Creditas/8.21/Demonstração/Modelo Creditas V4 - Leonardo.xlsm
+https://empirica.sharepoint.com/sites/Dados/Documentos Compartilhados/Empirica Cobrancas e Garantias/5 - Avaliacoes de Imoveis/Laudos Creditas/8.21/Demonstração/Modelo Exemplo.xlsm
 Rua Antonio Carlos 690, Consolação, São Paulo
-Rua Bela Cintra, 0, Consolação, São Paulo
-Rua Caio Prado, 0, Consolação, São Paulo
-Rua Caio Prado, 363, Consolação, São Paulo
-Rua Antônio Carlos, 0, Consolação, São Paulo
+Rua Augusta, 869, Consolação, São Paulo
+Rua Frei Caneca, 0, Consolação, São Paulo
 Rua Augusta, 150, Consolação, São Paulo
-Rua Augusta, 180, Consolação, São Paulo
+Rua Bela Cintra, 0, Consolação, São Paulo
+Rua Bela Cintra, Consolação, São Paulo
+Rua Pedro Taques, 100, Consolação, São Paulo

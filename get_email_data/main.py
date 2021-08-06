@@ -4,7 +4,9 @@ from datetime import datetime, timedelta
 import pandas as pd
 from win32com.client.selecttlb import TypelibSpec
 from utils import *
-import tqdm
+from tqdm import tqdm
+import pythoncom           # These 2 lines are here because COM library
+pythoncom.CoInitialize()   # is not initialized in the new thread
 
 
 def transform_string(string, keep=False):
@@ -22,25 +24,35 @@ def transform_string(string, keep=False):
 
 def get_bodys():
     outlook = win32com.client.Dispatch('Outlook.Application').GetNamespace("MAPI")
-    solicitacoes = outlook.Folders['Avaliações'].Folders['Caixa de Entrada']
+    solicitacoes = outlook.Folders['Avaliações'].Folders['Solicitações']
     messages = solicitacoes.Items
 
     solicitacao1 = 'Creditas - Solicitação de Laudo'
     solicitacao2 = 'Creditas - Solicitação de Laudo Remoto'
+    tipos_solicitacoes = [solicitacao1, solicitacao2]
 
     pedidos = 0
     bodys = []
     solicitacoes = []
 
+    #print(messages.GetLast())
+    #print(messages.GetLast().SentOn.strftime("%d-%m-%y"))
+
     pedidos = 0
+    print('Colhendo Mensagens...')
     for msg in messages:
         subject_splited = msg.Subject.split(':')
+        
+        not_solicitaoes = ['ENC', 'RES', 'Re']
+        try:
+            if subject_splited[0] not in not_solicitaoes:
+                if subject_splited[0].strip() in tipos_solicitacoes:
+                    bodys.append(msg.body.strip())
+                    pedidos += 1
+        except:
+            pass
 
-        if subject_splited[1].strip() == solicitacao1 or subject_splited[1].strip() == solicitacao2:
-            bodys.append(msg.body.strip())
-            pedidos += 1
-
-        if pedidos >= 5:
+        if pedidos >= 10:
             break
 
     return bodys
@@ -72,7 +84,7 @@ def split_addresses(endereco_completo, UF):
         inicio_complemento = False
         fim = False
 
-        for i in range(len(rua_numero)):
+        for i in  range(len(rua_numero)):
             if not inicio_complemento:
                 endereco += ' '+rua_numero[i]
             else:
@@ -102,8 +114,8 @@ def parse_informations(bodys_list):
     observacoes = []
 
     if len(bodys_list) > 0:
-        print('COLHENDO DADOS DO EMAIL')
-        for j in range(len(bodys_list)):
+        print('COLHENDO DADOS DO EMAIL...')
+        for j in tqdm(range(len(bodys_list))):
             body = bodys_list[j]
             splited_text = body.split('\n')
 
