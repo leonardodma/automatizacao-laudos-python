@@ -1,3 +1,5 @@
+import math
+
 def get_adress(dom, idx):
     try:
         full_adress = dom.xpath(f'/html/body/main/div[2]/div[1]/section/div[2]/div[1]/div[{str(idx)}]/div/article/a/div/h2/span[2]/span[1]')[0].text.strip()
@@ -36,8 +38,13 @@ def get_area(dom, idx):
 def get_quartos(dom, idx):
     try: 
         quartos = dom.xpath(f'/html/body/main/div[2]/div[1]/section/div[2]/div[1]/div[{str(idx)}]/div/article/a/div/ul[1]/li[2]/span[1]')[0].text.strip()
+        try:
+            quartos = int(quartos)
+        except:
+            quartos = math.ceil(float((quartos.split('-')[0] + quartos.split('-')[1])/2))
+
     except:
-        quartos = ""
+        quartos = 0
     
     return quartos
 

@@ -2,6 +2,7 @@
 # Github - leonardodma
 
 # Imports Bibliotecas Básicas
+import math
 from numpy.lib.function_base import append
 import pandas as pd 
 import numpy as np
@@ -11,6 +12,7 @@ from pathlib import Path
 import re
 import json
 from statistics import mean
+
 
 # Imports Selenium (Navegador Web) - Obter Links dos imóveis 
 from selenium import webdriver
@@ -87,7 +89,7 @@ class Crawler_ZapImoveis():
 
         barra = str(r' / ')[1]
 
-        time.sleep(7)
+        time.sleep(8)
         url = self.driver.current_url
 
         return barra.join(url.split(barra)[0:6])
@@ -175,12 +177,17 @@ class Crawler_ZapImoveis():
 
                     # Quartos
                     quarto = list(map(str, data[i]["listing"]["bedrooms"])) 
-                    if len(quarto) > 0:
-                        quartos.append("-".join(quarto))
+                    if len(quarto) > 1:
+                        soma = 0
+                        for i in range(len(quarto)):
+                            soma += int(quarto[i])
+                        
+                        quartos.append(math.ceil(float(soma/len(quarto))))
+                        
                     elif len(quarto) == 0:
-                        quartos.append('')
+                        quartos.append(0)
                     else:
-                        quartos.append(quartos[0])
+                        quartos.append(int(quarto[0]))
 
                     # Banheiros
                     try:
@@ -204,7 +211,7 @@ class Crawler_ZapImoveis():
                     
             pagina += 1
 
-            if pagina > 6:
+            if pagina > 8:
                 end = True
 
         self.data_zap_imoveis['Estado'] = estados

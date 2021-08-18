@@ -10,6 +10,7 @@ import os, os.path
 from pathlib import Path
 import openpyxl
 import pathlib
+from scipy import stats
 
 
 # Imports Selenium (Navegador Web) - Obter Links dos imóveis 
@@ -27,7 +28,6 @@ class Crawler_Full():
         # Variável para guardar os dados coletados
         self.all_data = None
 
-
         # Chrome Driver
         chromedriver_path = Path(str(Path(__file__).parent.resolve()) + '\software\chromedriver_win32\chromedriver.exe')
         options = Options()
@@ -38,7 +38,7 @@ class Crawler_Full():
 
         with open(str(pathlib.Path(__file__).parent.resolve())+str(r'\file.txt'), 'r') as f:
             informations = f.read().split('\n')
-            self.file_path = informations[0]
+            self.laudo = informations[0]
             self.bairro = informations[1]
             self.municipio = informations[2]
             self.tipo = informations[3]
@@ -47,9 +47,10 @@ class Crawler_Full():
                 self.area = int(informations[4])
             except:
                 self.area = int(float(".".join(informations[4].split(","))))
+            
+            self.quartos = int(informations[5])
         
         # Planilha
-        self.laudo = self.file_path
         print(f'LAUDO: {self.laudo}')
 
 
@@ -83,8 +84,28 @@ class Crawler_Full():
         zap_imoveis = crawler_zap_imoveis.get_data(search_string, tipo_imovel)
 
         self.merge_data([viva_real, zap_imoveis])
+
+
+    def valor_unitario(self):
+        precos = list(self.all_data['Preço'])
+        areas = list(self.all_data['Área'])
+        
+        valor_unitario = []
+        for i in range(len(precos)):
+            num = int("".join(precos[i].strip()[2:].split('.')))
+            value = float(f'{num/areas[i]:.2f}')
+            valor_unitario.append(value)
+        
+        return valor_unitario
     
 
+    def remove_outliers(self):
+        z_scores = stats.zscore(self.all_data['Valor unitário (R$/m²)'])
+        abs_z_scores = np.abs(z_scores)
+        filtered_entries = abs_z_scores < 2.5
+        self.all_data = self.all_data[filtered_entries]
+
+    
     def clean_dataframe(self):
         print('\n\n')
         self.all_data.replace('', np.nan, inplace=True)
@@ -93,8 +114,11 @@ class Crawler_Full():
         print(f'Área do imóvel analisado: {area_imovel}')
 
         print('LIMPANDO IMÓVEIS PELA ÁREA')
-        self.all_data = self.all_data[self.all_data['Área'] < area_imovel + area_imovel*0.4]
-        self.all_data = self.all_data[self.all_data['Área'] > area_imovel - area_imovel*0.4]
+        self.all_data = self.all_data[self.all_data['Área'] < area_imovel + area_imovel*0.2]
+        self.all_data = self.all_data[self.all_data['Área'] > area_imovel - area_imovel*0.2]
+
+        print('LIMPANDO ITEMS PELO NÚMERO DE QUARTOS')
+        self.all_data = self.all_data[self.all_data['Quarto'] == self.quartos]
 
         print('LIMPANDO ITENS REPETIDOS')
         drop_idx = []
@@ -122,20 +146,13 @@ class Crawler_Full():
             print('LIMPANDO ENDEREÇOS E PREÇOS VAZIOS')
             self.all_data = cleaned_df
         else:
-            print('Tem menos de oito itens Salvando itens sem endereço também' )
+            print('Tem menos de oito itens. Salvando itens sem endereço também!' )
+        
 
-    
-    def valor_unitario(self):
-        precos = list(self.all_data['Preço'])
-        areas = list(self.all_data['Área'])
-        
-        valor_unitario = []
-        for i in range(len(precos)):
-            num = int("".join(precos[i].strip()[2:].split('.')))
-            value = float(f'{num/areas[i]:.2f}')
-            valor_unitario.append(value)
-        
-        return valor_unitario
+        print('REMOVENDO OUTLIERS DO VALOR UNITÁRIO')
+        self.all_data['Valor unitário (R$/m²)'] =  self.valor_unitario()
+        self.remove_outliers()
+        self.all_data = self.all_data.sort_values(by=['Valor unitário (R$/m²)'])
 
 
     def save_dataframe(self):
@@ -153,9 +170,6 @@ class Crawler_Full():
 
         print('\n')
         print(f'Dados coletados foram salvos em: {save_path}')
-        
-        self.all_data['Valor unitário (R$/m²)'] =  self.valor_unitario()
-        self.all_data = self.all_data.sort_values(by=['Valor unitário (R$/m²)'])
         self.all_data.reset_index(drop=True, inplace=True)
         self.all_data.to_excel(save_path, sheet_name='Sheet1')
 
