@@ -68,7 +68,7 @@ class Crawler_Full():
             frames.append(df)
 
         self.all_data = pd.concat(frames)
-        self.all_data.to_excel(str(pathlib.Path(__file__).parent.resolve())+str(r'\all_data.xlsx'))
+        #self.all_data.to_excel(str(pathlib.Path(__file__).parent.resolve())+str(r'\all_data.xlsx'))
 
 
 
@@ -102,7 +102,7 @@ class Crawler_Full():
     def remove_outliers(self):
         z_scores = stats.zscore(self.all_data['Valor unitário (R$/m²)'])
         abs_z_scores = np.abs(z_scores)
-        filtered_entries = abs_z_scores < 2.5
+        filtered_entries = abs_z_scores < 2.0
         self.all_data = self.all_data[filtered_entries]
 
     
