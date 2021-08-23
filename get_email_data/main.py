@@ -43,7 +43,7 @@ def transform_string(string, keep=False):
 
 def get_bodys():
     outlook = win32com.client.Dispatch('Outlook.Application').GetNamespace("MAPI")
-    solicitacoes = outlook.Folders['Avaliações'].Folders['Solicitações']
+    solicitacoes = outlook.Folders['Avaliações'].Folders['Caixa de Entrada']
     messages = solicitacoes.Items
     messages.Sort("[ReceivedTime]", True)
 
@@ -61,7 +61,6 @@ def get_bodys():
     for msg in messages:
         if not fim:
             data = msg.SentOn.strftime("%d/%m/%y")
-            print(data)
             subject_splited = msg.Subject.split(':')
             
             not_solicitaoes = ['ENC', 'RES', 'Re']
@@ -270,7 +269,6 @@ def parse_informations(bodys_list):
 if __name__ == '__main__':
     bodys = get_bodys()
     parse_informations(bodys)
-    #driver.quit()
     
 
 #print(str(messages.GetLast().body).strip())
