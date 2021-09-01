@@ -92,7 +92,10 @@ class Crawler_Full():
         
         valor_unitario = []
         for i in range(len(precos)):
-            num = int("".join(precos[i].strip()[2:].split('.')))
+            try:
+                num = int("".join(precos[i].strip()[2:].split('.')))
+            except:
+                num = 0.0
             value = float(f'{num/areas[i]:.2f}')
             valor_unitario.append(value)
         
@@ -166,7 +169,7 @@ class Crawler_Full():
         if planilha_path == barra:
             save_path = barra.join(self.laudo.split(barra)[:-1]) + file_name
         else:
-            save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + planilha_path + file_name
+            save_path = user_path + str(r'\Documents\Empírica Investimentos Gestão de Recursos Ltda\EMPIRICA-COBRANCAS-E-GARANTIAS - Documentos\Empirica Cobrancas e Garantia\5 - Avaliacoes de Imoveis') + planilha_path + file_name
 
         print('\n')
         print(f'Dados coletados foram salvos em: {save_path}')

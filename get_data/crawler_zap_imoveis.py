@@ -176,30 +176,22 @@ class Crawler_ZapImoveis():
                     areas.append(int(mean(list(map(int, data[i]["listing"]["usableAreas"])))))
 
                     # Quartos
-                    quarto = list(map(str, data[i]["listing"]["bedrooms"])) 
-                    if len(quarto) > 1:
-                        soma = 0
-                        for i in range(len(quarto)):
-                            soma += int(quarto[i])
-                        
-                        quartos.append(math.ceil(float(soma/len(quarto))))
-                        
-                    elif len(quarto) == 0:
+                    try:
+                        quartos.append(int(mean(list(map(int, data[i]["listing"]["bedrooms"])))))
+                    except:
                         quartos.append(0)
-                    else:
-                        quartos.append(int(quarto[0]))
 
                     # Banheiros
                     try:
-                        banheiros.append(str(data[i]["listing"]["bathrooms"][0]))
+                        banheiros.append(int(mean(list(map(int, data[i]["listing"]["bathrooms"])))))
                     except:
-                        banheiros.append('0')
+                        banheiros.append(0)
                         
                     # Vagas
                     try:
-                        vagas.append(str(data[i]["listing"]["parkingSpaces"][0]))
+                        vagas.append(int(mean(list(map(int, data[i]["listing"]["parkingSpaces"])))))
                     except:
-                        vagas.append('0')
+                        vagas.append(0)
                     
                     # Preços
                     precos.append(data[i]["listing"]["pricingInfo"]["price"])

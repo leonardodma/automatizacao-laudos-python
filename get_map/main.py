@@ -34,8 +34,8 @@ def get_save_path(laudo_path):
         save_path = barra.join(laudo_path.split(barra)[:-1]) + '\img' + file_name
         folder = barra.join(laudo_path.split(barra)[:-1]) + '\img'
     else:
-        save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path + file_name
-        folder = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis') + img_path
+        save_path = user_path + str(r'\Documents\Empírica Investimentos Gestão de Recursos Ltda\EMPIRICA-COBRANCAS-E-GARANTIAS - Documentos\Empirica Cobrancas e Garantia\5 - Avaliacoes de Imoveis') + img_path + file_name
+        folder = user_path + str(r'\Documents\Empírica Investimentos Gestão de Recursos Ltda\EMPIRICA-COBRANCAS-E-GARANTIAS - Documentos\Empirica Cobrancas e Garantia\5 - Avaliacoes de Imoveis') + img_path
 
 
     return save_path, folder 
