@@ -262,7 +262,7 @@ def parse_informations(bodys_list):
     dados['Endereço Completo'] = endereco_completo
 
     df = pd.DataFrame.from_dict(dados)
-    path = str(r'C:\Users' f'\\{EMPIRICA_USER}' r'\Empírica Investimentos Gestão de Recursos Ltda\Dados - Documentos\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis\Laudos Creditas\novos_laudos.xlsx')
+    path = str(r'C:\Users' f'\\{EMPIRICA_USER}' r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\Laudos Creditas\novos_laudos.xlsx')
     df.to_excel(path, sheet_name='Sheet1')
 
 

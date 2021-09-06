@@ -25,15 +25,15 @@ def save_path():
     barra = str(r" \ ")[1]
     pyhon_file_path = str(Path(__file__).parent.resolve()).split(barra)
     user_path = barra.join(pyhon_file_path[:3])
-    img_path = barra + barra.join(planilha[8:-1]) + barra + 'img'
+    img_path = barra + barra.join(planilha[7:-1]) + barra + 'img'
     file_name = f'\\amostra{amostra}.png'
 
     if img_path == str(r'\\img'):
         save_path = barra.join(laudo_path.split(barra)[:-1]) + '\img' + file_name
         folder = barra.join(laudo_path.split(barra)[:-1]) + '\img'
     else:
-        save_path = user_path + str(r'\Documents\Empírica Investimentos Gestão de Recursos Ltda\EMPIRICA-COBRANCAS-E-GARANTIAS - Documentos\Empirica Cobrancas e Garantia\5 - Avaliacoes de Imoveis') + img_path + file_name
-        folder = user_path + str(r'\Documents\Empírica Investimentos Gestão de Recursos Ltda\EMPIRICA-COBRANCAS-E-GARANTIAS - Documentos\Empirica Cobrancas e Garantia\5 - Avaliacoes de Imoveis') + img_path
+        save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis') + img_path + file_name
+        folder = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis') + img_path
 
     return save_path, folder 
 

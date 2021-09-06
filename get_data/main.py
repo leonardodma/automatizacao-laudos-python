@@ -105,7 +105,7 @@ class Crawler_Full():
     def remove_outliers(self):
         z_scores = stats.zscore(self.all_data['Valor unitário (R$/m²)'])
         abs_z_scores = np.abs(z_scores)
-        filtered_entries = abs_z_scores < 2.0
+        filtered_entries = abs_z_scores < 3.0
         self.all_data = self.all_data[filtered_entries]
 
     
@@ -144,18 +144,17 @@ class Crawler_Full():
         cleaned_df = pd.DataFrame.copy(self.all_data)
         cleaned_df.dropna(subset=['Endereço'], inplace=True)
         cleaned_df.dropna(subset=['Preço'], inplace=True)
+
+        # Criando coluna dos valores unitários
+        self.all_data['Valor unitário (R$/m²)'] =  self.valor_unitario()
+        self.all_data = self.all_data.sort_values(by=['Valor unitário (R$/m²)'])
         
         if len(cleaned_df.index) > 8:
-            print('LIMPANDO ENDEREÇOS E PREÇOS VAZIOS')
+            print('LIMPANDO ENDEREÇOS, PREÇOS VAZIOS E OUTLIERS DO VALOR UNITÁRIO')
             self.all_data = cleaned_df
+            self.remove_outliers()
         else:
             print('Tem menos de oito itens. Salvando itens sem endereço também!' )
-        
-
-        print('REMOVENDO OUTLIERS DO VALOR UNITÁRIO')
-        self.all_data['Valor unitário (R$/m²)'] =  self.valor_unitario()
-        self.remove_outliers()
-        self.all_data = self.all_data.sort_values(by=['Valor unitário (R$/m²)'])
 
 
     def save_dataframe(self):
@@ -163,13 +162,13 @@ class Crawler_Full():
         barra = str(r" \ ")[1]
         pyhon_file_path = str(Path(__file__).parent.resolve()).split(barra)
         user_path = barra.join(pyhon_file_path[:3])
-        planilha_path = barra + barra.join(planilha[8:-1])
+        planilha_path = barra + barra.join(planilha[7:-1])
         file_name = r'\dados_coletados.xlsx'
 
         if planilha_path == barra:
             save_path = barra.join(self.laudo.split(barra)[:-1]) + file_name
         else:
-            save_path = user_path + str(r'\Documents\Empírica Investimentos Gestão de Recursos Ltda\EMPIRICA-COBRANCAS-E-GARANTIAS - Documentos\Empirica Cobrancas e Garantia\5 - Avaliacoes de Imoveis') + planilha_path + file_name
+            save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis') + planilha_path + file_name
 
         print('\n')
         print(f'Dados coletados foram salvos em: {save_path}')
