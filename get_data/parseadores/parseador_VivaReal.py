@@ -26,7 +26,7 @@ def get_adress(dom, idx):
 def get_area(dom, idx):
     try:
         area = dom.xpath(
-            f'/html/body/main/div[2]/div[1]/section/div[2]/div[1]/div[{str(idx)}]/div/article/a/div/ul/li[1]/span[1]')[0].text.strip()
+            f'/html/body/main/div[2]/div[1]/section/div[2]/div[1]/div[{str(idx)}]/div/article/a/div/ul[1]/li[1]/span[1]')[0].text.strip()
         try:
             return int(area)
         except:
@@ -57,7 +57,7 @@ def get_banheiros(dom, idx):
     try:
 
         banheiros = dom.xpath(
-            f'/html/body/main/div[2]/div[1]/section/div[2]/div[1]/div[{str(idx)}]/div/article/a/div/ul/li[3]/span[1]')[0].text.strip()
+            f'/html/body/main/div[2]/div[1]/section/div[2]/div[1]/div[{str(idx)}]/div/article/a/div/ul[1]/li[3]/span[1]')[0].text.strip()
 
         try:
             banheiros = int(banheiros)
@@ -103,6 +103,8 @@ def get_link(dom, idx):
             f'/html/body/main/div[2]/div[1]/section/div[2]/div[1]/div[{str(idx)}]/div/article/a/@href')[0]
     except:
         link = ""
+    
+    print("Link: ", link)
 
     return link
 
@@ -129,5 +131,7 @@ def get_next_page(dom, tipo):
                 correto = True
             except:
                 n += 1
+    
+    print("Next page: ", next_page)
 
     return next_page

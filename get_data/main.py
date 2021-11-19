@@ -1,19 +1,19 @@
-# Author - Leonardo Duarte Malta de Abreu 
+# Author - Leonardo Duarte Malta de Abreu
 # Github - leonardodma
 
 # Imports Bibliotecas Básicas
 from re import search
 from numpy.lib.function_base import append, copy
-import pandas as pd 
+import pandas as pd
 import numpy as np
-import os, os.path
+import os
+import os.path
 from pathlib import Path
-import openpyxl
 import pathlib
-from scipy import stats
+#from scipy import stats
 
 
-# Imports Selenium (Navegador Web) - Obter Links dos imóveis 
+# Imports Selenium (Navegador Web) - Obter Links dos imóveis
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -29,12 +29,13 @@ class Crawler_Full():
         self.all_data = None
 
         # Chrome Driver
-        chromedriver_path = Path(str(Path(__file__).parent.resolve()) + '\software\chromedriver_win32\chromedriver.exe')
+        chromedriver_path = Path(str(Path(__file__).parent.resolve(
+        )) + '\software\chromedriver_win32\chromedriver.exe')
         options = Options()
         options.add_argument("--window-size=1920x1800")
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        self.driver = webdriver.Chrome(executable_path = chromedriver_path, options=options)
-
+        self.driver = webdriver.Chrome(
+            executable_path=chromedriver_path, options=options)
 
         with open(str(pathlib.Path(__file__).parent.resolve())+str(r'\file.txt'), 'r') as f:
             informations = f.read().split('\n')
@@ -47,18 +48,16 @@ class Crawler_Full():
                 self.area = int(informations[4])
             except:
                 self.area = int(float(".".join(informations[4].split(","))))
-            
+
             self.quartos = int(informations[5])
-        
+
         # Planilha
         print(f'LAUDO: {self.laudo}')
-
 
     def get_search_string(self):
         search_string = f'{self.bairro}, {self.municipio}'.strip()
 
         return search_string, self.tipo
-
 
     def merge_data(self, data_dict_list):
         frames = []
@@ -68,9 +67,7 @@ class Crawler_Full():
             frames.append(df)
 
         self.all_data = pd.concat(frames)
-        #self.all_data.to_excel(str(pathlib.Path(__file__).parent.resolve())+str(r'\all_data.xlsx'))
-
-
+        # self.all_data.to_excel(str(pathlib.Path(__file__).parent.resolve())+str(r'\all_data.xlsx'))
 
     def get_data(self):
         search_string, tipo_imovel = self.get_search_string()
@@ -83,13 +80,15 @@ class Crawler_Full():
         viva_real = crawler_viva_real.get_data(search_string, tipo_imovel)
         zap_imoveis = crawler_zap_imoveis.get_data(search_string, tipo_imovel)
 
-        self.merge_data([viva_real, zap_imoveis])
+        print("DADOS VIVA REAL:")
+        print(viva_real)
 
+        self.merge_data([viva_real, zap_imoveis])
 
     def valor_unitario(self):
         precos = list(self.all_data['Preço'])
         areas = list(self.all_data['Área'])
-        
+
         valor_unitario = []
         for i in range(len(precos)):
             try:
@@ -98,17 +97,15 @@ class Crawler_Full():
                 num = 0.0
             value = float(f'{num/areas[i]:.2f}')
             valor_unitario.append(value)
-        
+
         return valor_unitario
-    
 
-    def remove_outliers(self):
-        z_scores = stats.zscore(self.all_data['Valor unitário (R$/m²)'])
-        abs_z_scores = np.abs(z_scores)
-        filtered_entries = abs_z_scores < 3.0
-        self.all_data = self.all_data[filtered_entries]
+    #def remove_outliers(self):
+        #z_scores = stats.zscore(self.all_data['Valor unitário (R$/m²)'])
+        #abs_z_scores = np.abs(z_scores)
+        #filtered_entries = abs_z_scores < 3.0
+        #self.all_data = self.all_data[filtered_entries]
 
-    
     def clean_dataframe(self):
         print('\n\n')
         self.all_data.replace('', np.nan, inplace=True)
@@ -117,8 +114,10 @@ class Crawler_Full():
         print(f'Área do imóvel analisado: {area_imovel}')
 
         print('LIMPANDO IMÓVEIS PELA ÁREA')
-        self.all_data = self.all_data[self.all_data['Área'] < area_imovel + area_imovel*0.2]
-        self.all_data = self.all_data[self.all_data['Área'] > area_imovel - area_imovel*0.2]
+        self.all_data = self.all_data[self.all_data['Área']
+                                      < area_imovel + area_imovel*0.2]
+        self.all_data = self.all_data[self.all_data['Área']
+                                      > area_imovel - area_imovel*0.2]
 
         print('LIMPANDO ITEMS PELO NÚMERO DE QUARTOS')
         self.all_data = self.all_data[self.all_data['Quarto'] == self.quartos]
@@ -146,16 +145,18 @@ class Crawler_Full():
         cleaned_df.dropna(subset=['Preço'], inplace=True)
 
         # Criando coluna dos valores unitários
-        self.all_data['Valor unitário (R$/m²)'] =  self.valor_unitario()
-        self.all_data = self.all_data.sort_values(by=['Valor unitário (R$/m²)'])
-        
-        if len(cleaned_df.index) > 8:
-            print('LIMPANDO ENDEREÇOS, PREÇOS VAZIOS E OUTLIERS DO VALOR UNITÁRIO')
-            self.all_data = cleaned_df
-            self.remove_outliers()
-        else:
-            print('Tem menos de oito itens. Salvando itens sem endereço também!' )
+        self.all_data['Valor unitário (R$/m²)'] = self.valor_unitario()
+        self.all_data = self.all_data.sort_values(
+            by=['Valor unitário (R$/m²)'])
 
+        if len(cleaned_df.index) > 8:
+            print('LIMPANDO ENDEREÇOS, PREÇOS VAZIOS')
+            self.all_data = cleaned_df
+            #self.remove_outliers()
+        else:
+            print('Tem menos de oito itens. Salvando itens sem endereço também!')
+        
+        print(self.all_data)
 
     def save_dataframe(self):
         planilha = self.laudo.split('/')
@@ -168,7 +169,9 @@ class Crawler_Full():
         if planilha_path == barra:
             save_path = barra.join(self.laudo.split(barra)[:-1]) + file_name
         else:
-            save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis') + planilha_path + file_name
+            save_path = user_path + \
+                str(r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis') + \
+                planilha_path + file_name
 
         print('\n')
         print(f'Dados coletados foram salvos em: {save_path}')
@@ -180,4 +183,4 @@ if __name__ == '__main__':
     crawler = Crawler_Full()
     crawler.get_data()
     crawler.clean_dataframe()
-    crawler.save_dataframe()
+    #crawler.save_dataframe()
