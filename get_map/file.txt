@@ -1,8 +1,8 @@
-https://empirica.sharepoint.com/sites/ESCO2/Documentos Compartilhados/5 - Avaliacoes de Imoveis/Laudos Creditas/8.21/Demonstração/Modelo Exemplo.xlsm
-Rua Agrário de Souza 194, 	Jardim Paulistano, São Paulo
-Rua Doutor Fernandes Coelho, 601, Jardim Paulistano, São Paulo
-0, Jardim Paulistano, São Paulo
-Rua Doutor Fernandes Coelho, 601, Jardim Paulistano, São Paulo
-0, Jardim Paulistano, São Paulo
-0, Jardim Paulistano, São Paulo
-0, Jardim Paulistano, São Paulo
+https://empirica.sharepoint.com/sites/ESCO2/Documentos Compartilhados/5 - Avaliacoes de Imoveis/Laudos Creditas/11.21/Teste Automatização/TESTE.xlsm
+Rua Engenheiro Mesquita Sampaio 373, 	Vila São Francisco (Zona Sul), São Paulo
+Rua Fernandes Moreira, 1452, Chácara Santo Antônio, São Paulo
+Rua do Estilo Barroco, 422, Santo Amaro, São Paulo
+Rua Senador Milton Campos, 155, Parque Santo Amaro, São Paulo
+Rua Andréa Paulinetti, 241, Jardim das Acacias, São Paulo
+Rua Andréa Paulinetti, 242, Campo Belo, São Paulo
+Rua Andréa Paulinetti, 242, Jardim das Acacias, São Paulo

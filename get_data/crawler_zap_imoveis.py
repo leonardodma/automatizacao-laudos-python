@@ -18,10 +18,10 @@ from statistics import mean
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait as wait
 
 # Imports Web Scraper - Obter Base de dados 
 from bs4 import BeautifulSoup
@@ -43,53 +43,66 @@ class Crawler_ZapImoveis():
         # Dom Xpath
         warnings.simplefilter('ignore', InsecureRequestWarning)
         self.ua = UserAgent()
+    
+    def obtem_elemento(self, xpath):
+        return wait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath)))
 
-    def seleciona_tipo(self, tipo_imovel):
+    def seleciona_tipo(self, elemento, tipo_imovel):
         if tipo_imovel == "Apartamento":
-            self.driver.find_element_by_xpath('//*[@id="l-select1"]/optgroup[2]/option[1]').click()
+            elemento.send_keys(Keys.DOWN)
         elif tipo_imovel  == "Apartamento Cobertura":
-            self.driver.find_element_by_xpath('//*[@id="l-select1"]/optgroup[2]/option[7]').click()
+            for i in range(7):
+                elemento.send_keys(Keys.RETURN)
         elif tipo_imovel == "Casa Condomínio": 
-            self.driver.find_element_by_xpath('//*[@id="l-select1"]/optgroup[2]/option[5]').click()
+            for i in range(5):
+                elemento.send_keys(Keys.RETURN)
         elif tipo_imovel == "Casa Residencial":
-            self.driver.find_element_by_xpath('//*[@id="l-select1"]/optgroup[2]/option[4]').click()
+            for i in range(4):
+                elemento.send_keys(Keys.RETURN)
         elif tipo_imovel == "Sala Comercial":
-            self.driver.find_element_by_xpath('//*[@id="l-select1"]/optgroup[3]/option[2]').click()
+            for i in range(13):
+                elemento.send_keys(Keys.RETURN)
         elif tipo_imovel == "Casa Comercial":
-            self.driver.find_element_by_xpath('//*[@id="l-select1"]/optgroup[3]/option[3]').click()
+            for i in range(14):
+                elemento.send_keys(Keys.RETURN)
         elif tipo_imovel == "Terreno":
-            terreno = self.driver.find_element_by_xpath('//*[@id="l-select1"]/optgroup[2]/option[10]')
-            time.sleep(1)
-            self.driver.execute_script("arguments[0].scrollIntoView();", terreno)
-            terreno.click()
+            for i in range(10):
+                elemento.send_keys(Keys.RETURN)
+
 
 
     def properties_url(self, search_str, tipo_imovel):
 
         self.driver.get('https://www.zapimoveis.com.br/')
+
+        # Aceitar Cookies
+        aceitar_cookies = self.obtem_elemento('//*[@id="cookie-notifier-cta"]')
+        aceitar_cookies.click()
         
+        # Ajudar pra div de pesquisa
+        div_pesquisa = self.obtem_elemento('//*[@id="app"]/section/section[2]/div/section/form')
+        self.driver.execute_script("arguments[0].scrollIntoView();", div_pesquisa)
+
         # Colocar string de pesquisa 
-        search_box = self.driver.find_element_by_xpath('//*[@id="app"]/section/section[1]/div/section/form/div/div[2]/div/div/div/input')
+        search_box = self.obtem_elemento('//*[@id="app"]/section/section[2]/div/section/form/div/div[2]/div/div/div/input')
         search_box.send_keys(search_str)
 
-        # Esperar tempo para aparecer as sugestões
-        time.sleep(8)
-
         # Selecionar a primeira sugestão 
+        time.sleep(2)
         search_box.send_keys(Keys.RETURN)
 
         # Abrir Caixa de Seleção dos tipos de imóveis 
-        time.sleep(2)
-        self.driver.find_element_by_xpath('//*[@id="l-select1"]').click()
-        self.seleciona_tipo(tipo_imovel)
+        elemento = self.obtem_elemento('//*[@id="l-select1"]')
+        elemento.click()
+        self.seleciona_tipo(elemento, tipo_imovel)
+        elemento.send_keys(Keys.RETURN)
 
         # Finaliza pesquisa
-        self.driver.find_element_by_xpath('//*[@id="app"]/section/section[1]/div/section/form/div/div[2]/button').click()
-        time.sleep(2)
+        self.obtem_elemento('//*[@id="app"]/section/section[2]/div/section/form/div/div[2]/button').click()
 
         barra = str(r' / ')[1]
 
-        time.sleep(8)
+        time.sleep(5)
         url = self.driver.current_url
 
         return barra.join(url.split(barra)[0:6])

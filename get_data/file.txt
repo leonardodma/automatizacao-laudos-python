@@ -1,6 +1,6 @@
-https://empirica.sharepoint.com/sites/ESCO2/Documentos Compartilhados/5 - Avaliacoes de Imoveis/Laudos Creditas/8.21/Demonstração/Modelo Exemplo.xlsm
-	Jardim Paulistano
+https://empirica.sharepoint.com/sites/ESCO2/Documentos Compartilhados/5 - Avaliacoes de Imoveis/Laudos Creditas/11.21/Teste Automatização/TESTE.xlsm
+	Vila São Francisco (Zona Sul)
 São Paulo
-Apartamento
-60
+
+70
 2

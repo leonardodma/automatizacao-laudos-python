@@ -11,13 +11,12 @@ from pathlib import Path
 from tqdm import tqdm
 
 # Imports Selenium (Navegador Web) - Obter Links dos imóveis 
-from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait as wait
 
 # Imports Web Scraper - Obter Base de dados 
 from bs4 import BeautifulSoup
@@ -43,71 +42,65 @@ class Crawler_VivaReal():
         warnings.simplefilter('ignore', InsecureRequestWarning)
         self.ua = UserAgent()
 
+    def obtem_elemento(self, xpath):
+        return wait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath)))
+
     def seleciona_tipo(self, tipo_imovel):
         # O que é imovel misto?
         if tipo_imovel == "Apartamento" or tipo_imovel == "Apartamento Cobertura":
-            self.driver.find_element_by_xpath('//*[@id="unit-type-APARTMENT|UnitSubType_NONE,DUPLEX,LOFT,STUDIO,TRIPLEX|RESIDENTIAL|APARTMENT"]').click()
+            self.obtem_elemento('//*[@id="unit-type-APARTMENT|UnitSubType_NONE,DUPLEX,LOFT,STUDIO,TRIPLEX|RESIDENTIAL|APARTMENT"]').click()
         elif tipo_imovel == "Casa Condomínio" or tipo_imovel == "Casa Residencial":
-            self.driver.find_element_by_xpath('//*[@id="unit-type-HOME|UnitSubType_NONE,SINGLE_STOREY_HOUSE,VILLAGE_HOUSE,KITNET|RESIDENTIAL|HOME"]').click()
+            self.obtem_elemento('//*[@id="unit-type-HOME|UnitSubType_NONE,SINGLE_STOREY_HOUSE,VILLAGE_HOUSE,KITNET|RESIDENTIAL|HOME"]').click()
         elif tipo_imovel == "Sala Comercial":
-            self.driver.find_element_by_xpath('//*[@id="unit-type-OFFICE|UnitSubType_NONE,OFFICE,FLOOR|COMMERCIAL|OFFICE"]').click()
+            self.obtem_elemento('//*[@id="unit-type-OFFICE|UnitSubType_NONE,OFFICE,FLOOR|COMMERCIAL|OFFICE"]').click()
         elif tipo_imovel == "Casa Comercial":
-            self.driver.find_element_by_xpath('//*[@id="unit-type-HOME|UnitSubType_NONE|COMMERCIAL|COMMERCIAL_PROPERTY"]').click()
+            self.obtem_elemento('//*[@id="unit-type-HOME|UnitSubType_NONE|COMMERCIAL|COMMERCIAL_PROPERTY"]').click()
         elif tipo_imovel == "Terreno":
-            self.driver.find_element_by_xpath('//*[@id="unit-type-ALLOTMENT_LAND|UnitSubType_NONE,CONDOMINIUM,VILLAGE_HOUSE|RESIDENTIAL|RESIDENTIAL_ALLOTMENT_LAND"]').click()
-
+            self.obtem_elemento('//*[@id="unit-type-ALLOTMENT_LAND|UnitSubType_NONE,CONDOMINIUM,VILLAGE_HOUSE|RESIDENTIAL|RESIDENTIAL_ALLOTMENT_LAND"]').click()
 
     def properties_url(self, search_str, tipo_imovel):
 
         self.driver.get('https://www.vivareal.com.br/venda/')
-        edit_filters = self.driver.find_element_by_xpath('//*[@id="js-site-main"]/div[2]/div[1]/section/header/div/div/div[3]/div/button')
+        edit_filters = self.obtem_elemento('//*[@id="js-site-main"]/div[2]/div[1]/section/header/div/div/div[3]/div/button')
         edit_filters.click()
 
         # Aceitar os cookies da página 
-        time.sleep(2)
         try:
-            accept_cookies = self.driver.find_element_by_xpath('//*[@id="cookie-notifier-cta"]')
+            accept_cookies = self.obtem_elemento('//*[@id="cookie-notifier-cta"]')
             accept_cookies.click()
         except:
             pass
 
         # Colocar string de pesquisa 
-        search_box = self.driver.find_element_by_xpath('//*[@id="filter-location-search-input"]')
+        search_box = self.obtem_elemento('//*[@id="filter-location-search-input"]')
         search_box.send_keys(search_str)
+        time.sleep(3)
         
-        # Esperar tempo para aparecer as sugestões
-        time.sleep(8)
-
         # Selecionar a primeira sugestão 
         search_box.send_keys(Keys.RETURN)
 
         # Filtrar tipo de imóvel (Apartamento, Casa, Sala, Loja, Loteamento)
         # 1) Clicar em "mostrar todos"
-        time.sleep(2)
-        mostrar_todos = self.driver.find_element_by_xpath('//*[@id="js-site-main"]/div[2]/div[1]/nav/div/div/form/fieldset[1]/div[3]/div')
+        mostrar_todos = self.obtem_elemento('//*[@id="js-site-main"]/div[2]/div[1]/nav/div/div/form/fieldset[1]/div[3]/div')
         mostrar_todos.click()
 
         # 2) Ajuste à janela de seleção do tipo de imóvel
-        time.sleep(2)
-        janela_selecao = self.driver.find_element_by_xpath('//*[@id="js-site-main"]/div[2]/div[1]/nav/div/div/form/fieldset[1]/div[3]/div/div/div')
+        janela_selecao = self.obtem_elemento('//*[@id="js-site-main"]/div[2]/div[1]/nav/div/div/form/fieldset[1]/div[3]/div/div/div')
         self.driver.execute_script("arguments[0].scrollIntoView();", janela_selecao)
 
         # 3) Selecionar Tipo de Imóvel
-        time.sleep(2)
         self.seleciona_tipo(tipo_imovel)
 
         # 4) Reajustar à "mostrar todos" novamente
-        time.sleep(2)
         self.driver.execute_script("arguments[0].scrollIntoView();", mostrar_todos)
         mostrar_todos.click()
         
         # Terminar a edição 
-        time.sleep(1)
-        finish_edit = self.driver.find_element_by_xpath('//*[@id="js-site-main"]/div[2]/div[1]/nav/div/div/form/div/a')
+        finish_edit = self.obtem_elemento('//*[@id="js-site-main"]/div[2]/div[1]/nav/div/div/form/div/a')
         finish_edit.click()
 
         # Retornar o URL com os imóveis 
-        time.sleep(7)
+        time.sleep(3)
 
 
         return self.driver.current_url
