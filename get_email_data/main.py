@@ -1,3 +1,5 @@
+from credentials import EMPIRICA_USER, EMPIRICA_EMAIL, SENHA_JIRA
+import pythoncom           # These 2 lines are here because COM library
 from ast import ExtSlice
 import win32com.client
 import os
@@ -11,17 +13,22 @@ from tqdm import tqdm
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from pathlib import Path
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait as wait
 
-# Chrome Driver 
-chromedriver_path = Path(str(Path(__file__).parent.resolve()) + '\software\chromedriver_win32\chromedriver.exe')
+# Chrome Driver
+chromedriver_path = Path(str(Path(__file__).parent.resolve(
+)) + '\software\chromedriver_win32\chromedriver.exe')
 options = Options()
 options.add_argument("--start-maximized")
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
 
-import pythoncom           # These 2 lines are here because COM library
 pythoncom.CoInitialize()   # is not initialized in the new thread
-from credentials import EMPIRICA_USER, EMPIRICA_EMAIL, SENHA_JIRA
 
 
 def transform_string(string, keep=False):
@@ -35,14 +42,15 @@ def transform_string(string, keep=False):
                 words.append(word[0]+word[1:].lower())
             else:
                 words.append(word.lower())
-        
+
         return " ".join(words)
     else:
         return string.strip()
 
 
 def get_bodys():
-    outlook = win32com.client.Dispatch('Outlook.Application').GetNamespace("MAPI")
+    outlook = win32com.client.Dispatch(
+        'Outlook.Application').GetNamespace("MAPI")
     solicitacoes = outlook.Folders['Avaliações'].Folders['Caixa de Entrada']
     messages = solicitacoes.Items
     messages.Sort("[ReceivedTime]", True)
@@ -62,21 +70,22 @@ def get_bodys():
         if not fim:
             data = msg.SentOn.strftime("%d/%m/%y")
             subject_splited = msg.Subject.split(':')
-            
+
             not_solicitaoes = ['ENC', 'RES', 'Re']
             try:
                 if subject_splited[0] not in not_solicitaoes:
                     if subject_splited[0].strip() in tipos_solicitacoes:
-                        print(f'Deseja colher os dados do email com descrição "{msg.Subject}"", enviado {data}? [S/N]')
+                        print(
+                            f'Deseja colher os dados do email com descrição "{msg.Subject}"", enviado {data}? [S/N]')
                         awsr = input('Digite sua resposta: ')
                         if awsr == 'S':
                             bodys.append(msg.body.strip())
                             pedidos += 1
-                        else: 
-                            fim = True 
+                        else:
+                            fim = True
             except:
                 pass
-        
+
         else:
             break
 
@@ -103,13 +112,13 @@ def split_addresses(endereco_completo, UF):
         endereco_completo = endereco_completo.split('-')
         rua_numero = endereco_completo[0].split(" ")
         complemento = endereco_completo[1]
-        
+
         endereco = ""
         numero = ""
         inicio_complemento = False
         fim = False
 
-        for i in  range(len(rua_numero)):
+        for i in range(len(rua_numero)):
             if not inicio_complemento:
                 endereco += ' '+rua_numero[i]
             else:
@@ -120,65 +129,104 @@ def split_addresses(endereco_completo, UF):
                     endereco = " ".join(endereco.strip().split(' ')[:-1])
                     inicio_complemento = True
                     fim = True
-    
+
     return endereco, numero.strip(), complemento.strip()
 
 
+def obtem_elemento(driver, xpath):
+    return wait(driver, 5).until(EC.presence_of_element_located((By.XPATH, xpath)))
+
+
 def download_documents(link, folder):
-    prefs = {"download.default_directory" : folder}
+    prefs = {"download.default_directory": folder}
     options.add_experimental_option("prefs", prefs)
-    driver = webdriver.Chrome(executable_path = chromedriver_path, options=options)
+    driver = webdriver.Chrome(
+        executable_path=chromedriver_path, options=options)
     driver.get(link)
     time.sleep(4)
 
     # Colocar email
-    driver.find_element_by_xpath('//*[@id="user-email"]').send_keys(EMPIRICA_EMAIL)
-    time.sleep(2)
+    obtem_elemento(driver, '//*[@id="user-email"]').send_keys(EMPIRICA_EMAIL)
 
     # Seleciona próximo
-    driver.find_element_by_xpath('//*[@id="login-button"]').click()
-    time.sleep(4)
+    obtem_elemento(driver, '//*[@id="login-button"]').click()
+    time.sleep(2)
 
     # Seleciona Entrar com login Único
-    driver.find_element_by_xpath('//*[@id="login-button"]').click()
+    obtem_elemento(driver, '//*[@id="login-button"]').click()
     time.sleep(2)
 
-    # Seleciona Continuar 
-    driver.find_element_by_xpath('//*[@id="login-submit"]').click()
-    time.sleep(1)
-
-    # Digita a senha 
-    driver.find_element_by_xpath('//*[@id="password"]').send_keys(SENHA_JIRA)
-    time.sleep(1)
-
-    # Seleciona Continuar 
-    driver.find_element_by_xpath('//*[@id="login-submit"]').click()
-    time.sleep(10)
-
-    # Recolhe para a div documentos
-    div_documentos = driver.find_element_by_xpath('//*[@id="root"]/div[1]/div/div/div[2]/main/div/div[2]/div[1]/div[2]')
-    driver.execute_script("arguments[0].scrollIntoView();", div_documentos)
-    time.sleep(1)
-
-    # Clica no primeiro documento 
-    driver.find_element_by_xpath('//*[@id="root"]/div[1]/div/div/div[2]/main/div/div[2]/div[1]/div[2]/div[2]/div[1]/div/div[2]/div/div[2]/div/div[2]/div/div[1]/div/div/div/div/div[2]').click()
+    # Seleciona Continuar
+    obtem_elemento(driver, '//*[@id="login-submit"]').click()
     time.sleep(2)
 
-    # Clica no botão de download
-    driver.find_element_by_xpath('/html/body/div[4]/div/div/div[2]/div[1]/div/div[2]/button').click()
-    time.sleep(3)
+    # Digita a senha
+    obtem_elemento(driver, '//*[@id="password"]').send_keys(SENHA_JIRA)
 
-    # Fecha o primeiro documento 
-    driver.find_element_by_xpath('/html/body/div[4]/div/div/div[1]/button').click()
+    # Seleciona Continuar
+    obtem_elemento(driver, '//*[@id="login-submit"]').click()
     time.sleep(2)
 
-    # Clica no segundo documento 
-    driver.find_element_by_xpath('//*[@id="root"]/div[1]/div/div/div[2]/main/div/div[2]/div[1]/div[2]/div[2]/div[1]/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div/div/div/div/div[2]').click()
-    time.sleep(2)
+    try:
+        mostrar_mais = obtem_elemento(driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div[2]/div[2]/div[1]/div[2]/div[1]/button/span')
+        driver.execute_script("arguments[0].scrollIntoView();", mostrar_mais)
+        mostrar_mais.click()
+        print("Clicou mostrar mais")
+        div_documentos = obtem_elemento(driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div[2]/div[2]/div[1]/div[2]/div[2]')
+        driver.execute_script("arguments[0].scrollIntoView();", div_documentos)
 
-    # Clica no botão de download
-    driver.find_element_by_xpath('/html/body/div[4]/div/div/div[2]/div[1]/div/div[2]/button').click()
-    time.sleep(3)
+        i = 1
+        falhou = False
+        while not falhou:
+            try:
+                # Clica no documento
+                obtem_elemento(
+                    driver, f'//*[@id="root"]/div[1]/div/div/div[2]/main/div[2]/div[2]/div[1]/div[2]/div[2]/div[1]/div/div[2]/div/div[2]/div/div[2]/div/div[{i}]/div/div/div/div/div[2]').click()
+                time.sleep(2)
+
+                # Clica no botão de download
+                obtem_elemento(
+                    driver, '/html/body/div[4]/div/div/div[2]/div[1]/div/div[2]/button').click()
+                time.sleep(2)
+
+                # Fecha o primeiro documento
+                obtem_elemento(
+                    driver, '/html/body/div[4]/div/div/div[1]/button').click()
+                time.sleep(2)
+
+                i += 1
+            except:
+                falhou = True
+
+    except:
+        # Recolhe para a div documentos
+        div_documentos = obtem_elemento(
+        driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div/div[2]/div[1]/div[2]')
+        driver.execute_script("arguments[0].scrollIntoView();", div_documentos)
+        time.sleep(2)
+        print("Documetos visíveis")
+        i = 1
+        falhou = False
+        while not falhou:
+            try:
+                # Clica no documento
+                obtem_elemento(
+                    driver, f'//*[@id="root"]/div[1]/div/div/div[2]/main/div/div[2]/div[1]/div[2]/div[2]/div[1]/div/div[2]/div/div[2]/div/div[2]/div/div[{i}]/div/div/div/div/div[2]').click()
+                time.sleep(2)
+
+                # Clica no botão de download
+                obtem_elemento(
+                    driver, '/html/body/div[4]/div/div/div[2]/div[1]/div/div[2]/button').click()
+                time.sleep(2)
+
+                # Fecha o primeiro documento
+                obtem_elemento(
+                    driver, '/html/body/div[4]/div/div/div[1]/button').click()
+                time.sleep(2)
+
+                i += 1
+            except:
+                falhou = True
 
 
 def parse_informations(bodys_list):
@@ -207,7 +255,7 @@ def parse_informations(bodys_list):
 
                     nome_cliente = transform_string(splited_text[i+3])
                     nome.append(nome_cliente)
-                    
+
                     # Cria pasta com nome do cliente:
                     client_path = create_client_path(nome_cliente)
 
@@ -230,13 +278,14 @@ def parse_informations(bodys_list):
                     cep.append(c)
                     b = get_bairro(c)
                     bairro.append(b)
-                    descricoes.append(get_obs(b, transform_string(splited_text[i+9])))
-
+                    descricoes.append(
+                        get_obs(b, transform_string(splited_text[i+9])))
 
                 # Colhe o link do Jira
                 if splited_text[i].strip() == 'Observações:':
                     try:
-                        link = splited_text[i+1].strip().split('Jira:')[1].strip()
+                        link = splited_text[i +
+                                            1].strip().split('Jira:')[1].strip()
                     except:
                         link = splited_text[i+1]
 
@@ -245,7 +294,6 @@ def parse_informations(bodys_list):
 
     else:
         print('Não há novos email para serem extraidos')
-
 
     dados = {}
     dados['Nome Cliente'] = nome
@@ -262,13 +310,11 @@ def parse_informations(bodys_list):
     dados['Endereço Completo'] = endereco_completo
 
     df = pd.DataFrame.from_dict(dados)
-    path = str(r'C:\Users' f'\\{EMPIRICA_USER}' r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\Laudos Creditas\novos_laudos.xlsx')
+    path = str(
+        r'C:\Users' f'\\{EMPIRICA_USER}' r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\Laudos Creditas\novos_laudos.xlsx')
     df.to_excel(path, sheet_name='Sheet1')
 
 
 if __name__ == '__main__':
     bodys = get_bodys()
     parse_informations(bodys)
-    
-
-#print(str(messages.GetLast().body).strip())

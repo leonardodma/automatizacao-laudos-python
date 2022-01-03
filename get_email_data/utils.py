@@ -67,7 +67,7 @@ def get_path():
     month = str(int(today[1]))
     time_folder = '.'.join([month, year])
     time_folder = f'\\{time_folder}'
-    path = r'C:\Users' + f'\\{EMPIRICA_USER}' + r'\Documents\Empírica Investimentos Gestão de Recursos Ltda\EMPIRICA-COBRANCAS-E-GARANTIAS - Documentos\Empirica Cobrancas e Garantia\5 - Avaliacoes de Imoveis\Laudos Creditas' + time_folder    
+    path = r'C:\Users' + f'\\{EMPIRICA_USER}' + r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\Laudos Creditas' + time_folder    
 
     return path
 
