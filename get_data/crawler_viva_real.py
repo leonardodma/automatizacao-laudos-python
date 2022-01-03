@@ -125,7 +125,6 @@ class Crawler_VivaReal():
     def get_data(self, search_str, tipo_imovel):
         main_URL = self.properties_url(search_str, tipo_imovel)
         time.sleep(2)
-        #self.driver.quit()
         print('\n\n')
         estados = []
         cidades = []
@@ -179,10 +178,8 @@ class Crawler_VivaReal():
                         precos.append(preco)
                         links.append(link)
 
-                #next_page = get_next_page(dom, tipo_imovel)
-                #print(next_page)
-                if pagina > 7:
-                    end = True
+            if pagina > 7:
+                end = True
                     
             pagina += 1
 
