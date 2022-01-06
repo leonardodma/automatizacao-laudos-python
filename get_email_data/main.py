@@ -51,7 +51,7 @@ def transform_string(string, keep=False):
 def get_bodys():
     outlook = win32com.client.Dispatch(
         'Outlook.Application').GetNamespace("MAPI")
-    solicitacoes = outlook.Folders['Avaliações'].Folders['Caixa de Entrada']
+    solicitacoes = outlook.Folders['Avaliações'].Folders['Solicitações']
     messages = solicitacoes.Items
     messages.Sort("[ReceivedTime]", True)
 
@@ -88,47 +88,42 @@ def get_bodys():
 
         else:
             break
+    
+    print("\n\n\n")
 
     return bodys
 
 
 def split_addresses(endereco_completo, UF):
     if UF != 'DF':
-        endereco_completo = endereco_completo.split('-')
-        rua_numero = endereco_completo[0].split(" ")
-        complemento = endereco_completo[1]
+        endereco_completo = endereco_completo.split(',')
+        endereco = endereco_completo[0]
+        numero = ""
+        complemento = ""
 
-        for i in range(len(rua_numero)):
-            try:
-                int(rua_numero[i])
-                numero = rua_numero[i]
-                rua_numero.pop(i)
-            except:
-                pass
+        if len(endereco_completo) == 2:
+            numero_complemento = endereco_completo[1].split('-')
+            
+            if len(numero_complemento) == 1:
+                if numero_complemento[0].count('(') > 0:
+                    numero = numero_complemento[0].split('(')[0]
+                    complemento = numero_complemento[0].split('(')[1].split(')')[0]
+                else:
+                    numero = numero_complemento[0]
+                    complemento = ""
+            else:
+                numero = numero_complemento[0].strip()
+                complemento = numero_complemento[1]
 
-        endereco = " ".join(rua_numero)
+        else:
+            numero = endereco_completo[1]
+            complemento = endereco_completo[2]
 
     else:
-        endereco_completo = endereco_completo.split('-')
-        rua_numero = endereco_completo[0].split(" ")
-        complemento = endereco_completo[1]
-
         endereco = ""
         numero = ""
-        inicio_complemento = False
-        fim = False
+        complemento = ""
 
-        for i in range(len(rua_numero)):
-            if not inicio_complemento:
-                endereco += ' '+rua_numero[i]
-            else:
-                numero += ' '+rua_numero[i]
-
-            if not fim:
-                if rua_numero[i] == 'Lote':
-                    endereco = " ".join(endereco.strip().split(' ')[:-1])
-                    inicio_complemento = True
-                    fim = True
 
     return endereco, numero.strip(), complemento.strip()
 
@@ -142,6 +137,7 @@ def download_documents(link, folder):
     options.add_experimental_option("prefs", prefs)
     driver = webdriver.Chrome(
         executable_path=chromedriver_path, options=options)
+
     driver.get(link)
     time.sleep(4)
 
@@ -171,7 +167,7 @@ def download_documents(link, folder):
         mostrar_mais = obtem_elemento(driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div[2]/div[2]/div[1]/div[2]/div[1]/button/span')
         driver.execute_script("arguments[0].scrollIntoView();", mostrar_mais)
         mostrar_mais.click()
-        print("Clicou mostrar mais")
+        #print("Clicou mostrar mais")
         div_documentos = obtem_elemento(driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div[2]/div[2]/div[1]/div[2]/div[2]')
         driver.execute_script("arguments[0].scrollIntoView();", div_documentos)
 
@@ -204,7 +200,7 @@ def download_documents(link, folder):
         driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div/div[2]/div[1]/div[2]')
         driver.execute_script("arguments[0].scrollIntoView();", div_documentos)
         time.sleep(2)
-        print("Documetos visíveis")
+        #print("Documetos visíveis")
         i = 1
         falhou = False
         while not falhou:
@@ -282,7 +278,7 @@ def parse_informations(bodys_list):
                         get_obs(b, transform_string(splited_text[i+9])))
 
                 # Colhe o link do Jira
-                if splited_text[i].strip() == 'Observações:':
+                if splited_text[i].strip() == "Observações":
                     try:
                         link = splited_text[i +
                                             1].strip().split('Jira:')[1].strip()
