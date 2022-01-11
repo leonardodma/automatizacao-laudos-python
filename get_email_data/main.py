@@ -9,6 +9,8 @@ import pandas as pd
 from win32com.client.selecttlb import TypelibSpec
 from utils import *
 from tqdm import tqdm
+from tkinter import *
+from tkinter import ttk
 
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
@@ -27,8 +29,44 @@ options = Options()
 options.add_argument("--start-maximized")
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-
 pythoncom.CoInitialize()   # is not initialized in the new thread
+
+
+class Selector():
+    def __init__(self, options_list, title):
+        # Creating root of object
+        self.root = Tk()
+        self.root.title(title)
+        self.root.geometry("+50+300")
+
+        # Creating frame to displace the options
+        frame = ttk.Frame(self.root, padding=(3, 3, 12, 12))
+        frame.grid(column=0, row=0, sticky=(N, S, E, W))
+
+        # Creating option list from python list recieved
+        var = StringVar(value=options_list)
+        self.lstbox = Listbox(frame, listvariable=var,
+                              selectmode=MULTIPLE, width=200, height=15)
+        self.lstbox.grid(column=0, row=0, columnspan=2)
+
+        btn = ttk.Button(frame, text="OK", command=self.select)
+        btn.grid(column=1, row=1)
+        self.root.mainloop()
+
+    def select(self):
+        reslist = list()
+        seleccion = self.lstbox.curselection()
+        self.selected_items = []
+        for i in seleccion:
+            entrada = self.lstbox.get(i)
+            reslist.append(entrada)
+        for val in reslist:
+            self.selected_items.append(val)
+
+        self.root.destroy()
+
+    def get_select(self):
+        return self.selected_items
 
 
 def transform_string(string, keep=False):
@@ -48,37 +86,33 @@ def transform_string(string, keep=False):
         return string.strip()
 
 
-def get_bodys():
-    outlook = win32com.client.Dispatch(
-        'Outlook.Application').GetNamespace("MAPI")
-    solicitacoes = outlook.Folders['Avaliações'].Folders['Solicitações']
-    messages = solicitacoes.Items
-    messages.Sort("[ReceivedTime]", True)
-
+def get_last_5_emails(solicitacoes):
     solicitacao1 = 'Creditas - Solicitação de Laudo'
     solicitacao2 = 'Creditas - Solicitação de Laudo Remoto'
     tipos_solicitacoes = [solicitacao1, solicitacao2]
 
+    not_solicitaoes = ['ENC', 'RES', 'Re']
     pedidos = 0
+    leads = []
     bodys = []
-    solicitacoes = []
+    
+    messages = solicitacoes.Items
+    messages.Sort("[ReceivedTime]", True)
 
-    pedidos = 0
-    print('Colhendo Mensagens...')
     fim = False
     for msg in messages:
         if not fim:
             data = msg.SentOn.strftime("%d/%m/%y")
             subject_splited = msg.Subject.split(':')
 
-            not_solicitaoes = ['ENC', 'RES', 'Re']
             try:
                 if subject_splited[0] not in not_solicitaoes:
                     if subject_splited[0].strip() in tipos_solicitacoes:
-                        print(
-                            f'Deseja colher os dados do email com descrição "{msg.Subject}"", enviado {data}? [S/N]')
-                        awsr = input('Digite sua resposta: ')
-                        if awsr == 'S':
+
+                        email = f'{msg.Subject}, enviado {data}.'
+
+                        if pedidos <= 5:
+                            leads.append(email)
                             bodys.append(msg.body.strip())
                             pedidos += 1
                         else:
@@ -89,9 +123,31 @@ def get_bodys():
         else:
             break
     
-    print("\n\n\n")
+    return leads, bodys
 
-    return bodys
+
+def get_bodys():
+    outlook = win32com.client.Dispatch('Outlook.Application').GetNamespace("MAPI")
+    solicitacoes_caixa_solicitacoes = outlook.Folders['Avaliações'].Folders['Solicitações']
+    solicitacoes_caixa_entrada = outlook.GetDefaultFolder(6)
+    
+    leads_caixa_solicitacoes, bodys_caixa_solicitacoes = get_last_5_emails(solicitacoes_caixa_solicitacoes)
+    #leads_caixa_entrada, bodys_caixa_entrada = get_last_5_emails(solicitacoes_caixa_entrada)
+    #leads = leads_caixa_solicitacoes + leads_caixa_entrada
+    #bodys = bodys_caixa_solicitacoes + bodys_caixa_entrada
+
+    leads = leads_caixa_solicitacoes
+    bodys = bodys_caixa_solicitacoes
+    
+    bodys_selected = []
+    list_box = Selector(leads, "Caixa de Solicitações")
+    chosen_options = list_box.get_select()
+
+    for i in range(len(leads)):
+        if leads[i] in chosen_options:
+            bodys_selected.append(bodys[i])
+
+    return bodys_selected
 
 
 def split_addresses(endereco_completo, UF):
@@ -103,11 +159,12 @@ def split_addresses(endereco_completo, UF):
 
         if len(endereco_completo) == 2:
             numero_complemento = endereco_completo[1].split('-')
-            
+
             if len(numero_complemento) == 1:
                 if numero_complemento[0].count('(') > 0:
                     numero = numero_complemento[0].split('(')[0]
-                    complemento = numero_complemento[0].split('(')[1].split(')')[0]
+                    complemento = numero_complemento[0].split(
+                        '(')[1].split(')')[0]
                 else:
                     numero = numero_complemento[0]
                     complemento = ""
@@ -123,7 +180,6 @@ def split_addresses(endereco_completo, UF):
         endereco = ""
         numero = ""
         complemento = ""
-
 
     return endereco, numero.strip(), complemento.strip()
 
@@ -164,11 +220,13 @@ def download_documents(link, folder):
     time.sleep(2)
 
     try:
-        mostrar_mais = obtem_elemento(driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div[2]/div[2]/div[1]/div[2]/div[1]/button/span')
+        mostrar_mais = obtem_elemento(
+            driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div[2]/div[2]/div[1]/div[2]/div[1]/button/span')
         driver.execute_script("arguments[0].scrollIntoView();", mostrar_mais)
         mostrar_mais.click()
         #print("Clicou mostrar mais")
-        div_documentos = obtem_elemento(driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div[2]/div[2]/div[1]/div[2]/div[2]')
+        div_documentos = obtem_elemento(
+            driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div[2]/div[2]/div[1]/div[2]/div[2]')
         driver.execute_script("arguments[0].scrollIntoView();", div_documentos)
 
         i = 1
@@ -197,7 +255,7 @@ def download_documents(link, folder):
     except:
         # Recolhe para a div documentos
         div_documentos = obtem_elemento(
-        driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div/div[2]/div[1]/div[2]')
+            driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div/div[2]/div[1]/div[2]')
         driver.execute_script("arguments[0].scrollIntoView();", div_documentos)
         time.sleep(2)
         #print("Documetos visíveis")
