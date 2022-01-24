@@ -42,13 +42,13 @@ Sub AddData()
         
         ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("I" + ROW).Value = lead
         ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("J" + ROW).Value = nome
-        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("M" + ROW).Value = municipio
-        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("N" + ROW).Value = uf
-        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("O" + ROW).Value = endereco
-        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("P" + ROW).Value = numero
-        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("Q" + ROW).Value = complemento
-        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("R" + ROW).Value = bairro
-        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("S" + ROW).Value = cep
+        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("L" + ROW).Value = municipio
+        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("M" + ROW).Value = uf
+        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("N" + ROW).Value = endereco
+        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("O" + ROW).Value = numero
+        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("P" + ROW).Value = complemento
+        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("Q" + ROW).Value = bairro
+        ThisWorkbook.Worksheets("Avaliação de Imóveis").Range("R" + ROW).Value = cep
         
         
         
@@ -64,7 +64,7 @@ Sub AddData()
 End Sub
 
 Sub SearchLaudos()
-    Call Shell("cmd.exe /S /K" & """python C:\Users\labreu\Documents\automatizacao-laudos-python\get_email_data\main.py""", vbNormalFocus)
+    Call Shell("cmd.exe /S /K" & """python C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_email_data\main.py""", vbNormalFocus)
 End Sub
 
 

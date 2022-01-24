@@ -86,7 +86,7 @@ def transform_string(string, keep=False):
         return string.strip()
 
 
-def get_last_5_emails(solicitacoes):
+def get_last_emails(solicitacoes, qtd=5):
     solicitacao1 = 'Creditas - Solicitação de Laudo'
     solicitacao2 = 'Creditas - Solicitação de Laudo Remoto'
     tipos_solicitacoes = [solicitacao1, solicitacao2]
@@ -102,24 +102,26 @@ def get_last_5_emails(solicitacoes):
     fim = False
     for msg in messages:
         if not fim:
-            data = msg.SentOn.strftime("%d/%m/%y")
-            subject_splited = msg.Subject.split(':')
-
             try:
-                if subject_splited[0] not in not_solicitaoes:
-                    if subject_splited[0].strip() in tipos_solicitacoes:
+                data = msg.SentOn.strftime("%d/%m/%y")
+                subject_splited = msg.Subject.split(':')
 
-                        email = f'{msg.Subject}, enviado {data}.'
+                try:
+                    if subject_splited[0] not in not_solicitaoes:
+                        if subject_splited[0].strip() in tipos_solicitacoes:
 
-                        if pedidos <= 5:
-                            leads.append(email)
-                            bodys.append(msg.body.strip())
-                            pedidos += 1
-                        else:
-                            fim = True
+                            email = f'{msg.Subject}, enviado {data}.'
+
+                            if pedidos <= qtd:
+                                leads.append(email)
+                                bodys.append(msg.body.strip())
+                                pedidos += 1
+                            else:
+                                fim = True
+                except:
+                    pass
             except:
                 pass
-
         else:
             break
     
@@ -131,13 +133,13 @@ def get_bodys():
     solicitacoes_caixa_solicitacoes = outlook.Folders['Avaliações'].Folders['Solicitações']
     solicitacoes_caixa_entrada = outlook.GetDefaultFolder(6)
     
-    leads_caixa_solicitacoes, bodys_caixa_solicitacoes = get_last_5_emails(solicitacoes_caixa_solicitacoes)
-    #leads_caixa_entrada, bodys_caixa_entrada = get_last_5_emails(solicitacoes_caixa_entrada)
-    #leads = leads_caixa_solicitacoes + leads_caixa_entrada
-    #bodys = bodys_caixa_solicitacoes + bodys_caixa_entrada
+    leads_caixa_solicitacoes, bodys_caixa_solicitacoes = get_last_emails(solicitacoes_caixa_solicitacoes, qtd=10)
+    leads_caixa_entrada, bodys_caixa_entrada = get_last_emails(solicitacoes_caixa_entrada)
+    leads = leads_caixa_solicitacoes + leads_caixa_entrada
+    bodys = bodys_caixa_solicitacoes + bodys_caixa_entrada
 
-    leads = leads_caixa_solicitacoes
-    bodys = bodys_caixa_solicitacoes
+    #leads = leads_caixa_solicitacoes
+    #bodys = bodys_caixa_solicitacoes
     
     bodys_selected = []
     list_box = Selector(leads, "Caixa de Solicitações")
