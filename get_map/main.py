@@ -9,11 +9,12 @@ import os
 import time
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from pathlib import Path
 
 
 # Chrome Driver 
-chromedriver_path = Path(str(Path(__file__).parent.resolve()) + '\software\chromedriver_win32\chromedriver.exe')
 options = Options()
 options.add_argument("--start-maximized")
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
@@ -116,7 +117,7 @@ def export_map_html():
 
 
 def export_map_png():
-    driver = webdriver.Chrome(executable_path = chromedriver_path, options=options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     html_file = current_path + str(r"\map.html")
     driver.get("file:///" + html_file)
     time.sleep(4)

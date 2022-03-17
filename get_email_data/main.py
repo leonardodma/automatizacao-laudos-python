@@ -14,20 +14,12 @@ from tkinter import ttk
 
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
-from pathlib import Path
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait as wait
-
-# Chrome Driver
-chromedriver_path = Path(str(Path(__file__).parent.resolve(
-)) + '\software\chromedriver_win32\chromedriver.exe')
-options = Options()
-options.add_argument("--start-maximized")
-options.add_experimental_option('excludeSwitches', ['enable-logging'])
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 pythoncom.CoInitialize()   # is not initialized in the new thread
 
@@ -134,12 +126,9 @@ def get_bodys():
     solicitacoes_caixa_entrada = outlook.GetDefaultFolder(6)
     
     leads_caixa_solicitacoes, bodys_caixa_solicitacoes = get_last_emails(solicitacoes_caixa_solicitacoes, qtd=10)
-    leads_caixa_entrada, bodys_caixa_entrada = get_last_emails(solicitacoes_caixa_entrada)
-    leads = leads_caixa_solicitacoes + leads_caixa_entrada
-    bodys = bodys_caixa_solicitacoes + bodys_caixa_entrada
-
-    #leads = leads_caixa_solicitacoes
-    #bodys = bodys_caixa_solicitacoes
+    #leads_caixa_entrada, bodys_caixa_entrada = get_last_emails(solicitacoes_caixa_entrada)
+    leads = leads_caixa_solicitacoes 
+    bodys = bodys_caixa_solicitacoes 
     
     bodys_selected = []
     list_box = Selector(leads, "Caixa de Solicitações")
@@ -191,10 +180,12 @@ def obtem_elemento(driver, xpath):
 
 
 def download_documents(link, folder):
+    options = Options()
+    options.add_argument("--start-maximized")
+    options.add_experimental_option('excludeSwitches', ['enable-logging'])
     prefs = {"download.default_directory": folder}
     options.add_experimental_option("prefs", prefs)
-    driver = webdriver.Chrome(
-        executable_path=chromedriver_path, options=options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
     driver.get(link)
     time.sleep(4)
@@ -257,7 +248,7 @@ def download_documents(link, folder):
     except:
         # Recolhe para a div documentos
         div_documentos = obtem_elemento(
-            driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div/div[2]/div[1]/div[2]')
+            driver, '//*[@id="root"]/div[1]/div/div/div[2]/main/div/div[3]/div[1]/div[2]')
         driver.execute_script("arguments[0].scrollIntoView();", div_documentos)
         time.sleep(2)
         #print("Documetos visíveis")
@@ -267,7 +258,7 @@ def download_documents(link, folder):
             try:
                 # Clica no documento
                 obtem_elemento(
-                    driver, f'//*[@id="root"]/div[1]/div/div/div[2]/main/div/div[2]/div[1]/div[2]/div[2]/div[1]/div/div[2]/div/div[2]/div/div[2]/div/div[{i}]/div/div/div/div/div[2]').click()
+                    driver, f'//*[@id="root"]/div[1]/div/div/div[2]/main/div/div[3]/div[1]/div[2]/div[2]/div[1]/div/div[2]/div/div[2]/div/div[2]/div/div[{i}]/div/div/div/div/div[2]').click()
                 time.sleep(2)
 
                 # Clica no botão de download
@@ -338,15 +329,11 @@ def parse_informations(bodys_list):
                         get_obs(b, transform_string(splited_text[i+9])))
 
                 # Colhe o link do Jira
-                if splited_text[i].strip() == "Observações":
-                    try:
-                        link = splited_text[i +
-                                            1].strip().split('Jira:')[1].strip()
-                    except:
-                        link = splited_text[i+1]
+                if splited_text[i].strip() == "Ticket:":
+                        link = splited_text[i+1].strip()
 
-                    # Faz o download dos documentos com o link do Jira
-                    download_documents(link, client_path)
+                        # Faz o download dos documentos com o link do Jira
+                        download_documents(link, client_path)
 
     else:
         print('Não há novos email para serem extraidos')
