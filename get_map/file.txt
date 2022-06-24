@@ -1,8 +1,2 @@
-https://empirica.sharepoint.com/sites/ESCO2/Documentos Compartilhados/5 - Avaliacoes de Imoveis/Laudos Creditas/11.21/Teste Automatização/TESTE.xlsm
-Rua Engenheiro Mesquita Sampaio 373, 	Vila São Francisco (Zona Sul), São Paulo
-Rua Fernandes Moreira, 1452, Chácara Santo Antônio, São Paulo
-Rua do Estilo Barroco, 422, Santo Amaro, São Paulo
-Rua Senador Milton Campos, 155, Parque Santo Amaro, São Paulo
-Rua Andréa Paulinetti, 241, Jardim das Acacias, São Paulo
-Rua Andréa Paulinetti, 242, Campo Belo, São Paulo
-Rua Andréa Paulinetti, 242, Jardim das Acacias, São Paulo
+https://empirica.sharepoint.com/sites/ESCO2/Documentos Compartilhados/5 - Avaliacoes de Imoveis/FIDC Wimo/5.22/TESTE/teste.xlsm
+SQNW 110 Bloco J  0, Setor Noroeste, Brasília

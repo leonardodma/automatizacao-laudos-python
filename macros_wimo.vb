@@ -1,17 +1,29 @@
 Sub RunPython()
     Set fs = CreateObject("Scripting.FileSystemObject")
     'Set a = fs.CreateTextFile("R:\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis\automatizacao-laudos-python\get_data\file.txt", True).
-    Set a = fs.CreateTextFile("C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_data\file.txt", True)
+    Set a = fs.CreateTextFile("C:\Users\labreu\Documents\automatizacao-laudos-python\get_data\file.txt", True)
     a.WriteLine (ThisWorkbook.FullName)
+
+    'Endereco
+    a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("E22"))
+    'numero
+    a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("Q22"))
+    'bairro
     a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("E23"))
+    'municipio
     a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("E24"))
+    'uf
+    a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("U24"))
+    'CEP
+    a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("U23"))
+    'tipo
     a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("E27"))
+
+    'area
     a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("U34"))
-    a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("G97"))
     a.Close
     
-    'Call Shell("cmd.exe /S /K" & """python R:\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis\automatizacao-laudos-python\get_data\main.py""", vbNormalFocus).
-    Call Shell("cmd.exe /S /K" & """python C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_data\main.py""", vbNormalFocus)
+    Call Shell("cmd.exe /S /K" & """python C:\Users\labreu\Documents\automatizacao-laudos-python\get_data\main.py""", vbNormalFocus)
 
 End Sub
 
@@ -25,7 +37,7 @@ Sub UpdateData()
     DataFile = ActiveWorkbook.Path
     
     a = Split(DataFile, "/")
-    folder = "C:/Users/tdoliveira/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/Laudos Creditas/" + a(8) + "/" + a(9)
+    folder = "C:/Users/labreu/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/FIDC Wimo/" + a(8) + "/" + a(9)
     DataFile2 = folder + "/dados_coletados.xlsx"
     
     
@@ -48,12 +60,12 @@ End Sub
 
 Sub DownloadImage1()
     Set fs = CreateObject("Scripting.FileSystemObject")
-    Set a = fs.CreateTextFile("C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_images\file.txt", True)
+    Set a = fs.CreateTextFile("C:\Users\labreu\Documents\automatizacao-laudos-python\get_images\file.txt", True)
     a.WriteLine (ThisWorkbook.FullName)
     a.WriteLine ("1" & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AO5") & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q7") & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q8"))
     a.Close
 
-    Call Shell("cmd.exe /S /C" & """python C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_images\main.py""", vbNormalFocus)
+    Call Shell("cmd.exe /S /C" & """python C:\Users\labreu\Documents\automatizacao-laudos-python\get_images\main.py""", vbNormalFocus)
     
     
      With ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AO5")
@@ -64,12 +76,12 @@ End Sub
 
 Sub DownloadImage2()
     Set fs = CreateObject("Scripting.FileSystemObject")
-    Set a = fs.CreateTextFile("C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_images\file.txt", True)
+    Set a = fs.CreateTextFile("C:\Users\labreu\Documents\automatizacao-laudos-python\get_images\file.txt", True)
     a.WriteLine (ThisWorkbook.FullName)
     a.WriteLine ("2" & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AO17") & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q19") & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q20"))
     a.Close
 
-    Call Shell("cmd.exe /S /C" & """python C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_images\main.py""", vbNormalFocus)
+    Call Shell("cmd.exe /S /C" & """python C:\Users\labreu\Documents\automatizacao-laudos-python\get_images\main.py""", vbNormalFocus)
     
     
      With ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AO17")
@@ -80,12 +92,12 @@ End Sub
 
 Sub DownloadImage3()
     Set fs = CreateObject("Scripting.FileSystemObject")
-    Set a = fs.CreateTextFile("C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_images\file.txt", True)
+    Set a = fs.CreateTextFile("C:\Users\labreu\Documents\automatizacao-laudos-python\get_images\file.txt", True)
     a.WriteLine (ThisWorkbook.FullName)
     a.WriteLine ("3" & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AO29") & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q31") & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q32"))
     a.Close
 
-    Call Shell("cmd.exe /S /C" & """python C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_images\main.py""", vbNormalFocus)
+    Call Shell("cmd.exe /S /C" & """python C:\Users\labreu\Documents\automatizacao-laudos-python\get_images\main.py""", vbNormalFocus)
     
     
      With ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AO29")
@@ -96,12 +108,12 @@ End Sub
 
 Sub DownloadImage4()
     Set fs = CreateObject("Scripting.FileSystemObject")
-    Set a = fs.CreateTextFile("C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_images\file.txt", True)
+    Set a = fs.CreateTextFile("C:\Users\labreu\Documents\automatizacao-laudos-python\get_images\file.txt", True)
     a.WriteLine (ThisWorkbook.FullName)
     a.WriteLine ("4" & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AO41") & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q43") & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q44"))
     a.Close
 
-    Call Shell("cmd.exe /S /C" & """python C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_images\main.py""", vbNormalFocus)
+    Call Shell("cmd.exe /S /C" & """python C:\Users\labreu\Documents\automatizacao-laudos-python\get_images\main.py""", vbNormalFocus)
     
     
      With ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AO41")
@@ -112,12 +124,12 @@ End Sub
 
 Sub DownloadImage5()
     Set fs = CreateObject("Scripting.FileSystemObject")
-    Set a = fs.CreateTextFile("C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_images\file.txt", True)
+    Set a = fs.CreateTextFile("C:\Users\labreu\Documents\automatizacao-laudos-python\get_images\file.txt", True)
     a.WriteLine (ThisWorkbook.FullName)
     a.WriteLine ("5" & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AO59") & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q61") & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q62"))
     a.Close
 
-    Call Shell("cmd.exe /S /C" & """python C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_images\main.py""", vbNormalFocus)
+    Call Shell("cmd.exe /S /C" & """python C:\Users\labreu\Documents\automatizacao-laudos-python\get_images\main.py""", vbNormalFocus)
     
     
      With ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AO59")
@@ -128,12 +140,12 @@ End Sub
 
 Sub DownloadImage6()
     Set fs = CreateObject("Scripting.FileSystemObject")
-    Set a = fs.CreateTextFile("C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_images\file.txt", True)
+    Set a = fs.CreateTextFile("C:\Users\labreu\Documents\automatizacao-laudos-python\get_images\file.txt", True)
     a.WriteLine (ThisWorkbook.FullName)
     a.WriteLine ("6" & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AO72") & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q73") & vbNewLine & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q74"))
     a.Close
 
-    Call Shell("cmd.exe /S /C" & """python C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_images\main.py""", vbNormalFocus)
+    Call Shell("cmd.exe /S /C" & """python C:\Users\labreu\Documents\automatizacao-laudos-python\get_images\main.py""", vbNormalFocus)
     
     
      With ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AO5")
@@ -143,213 +155,115 @@ Sub DownloadImage6()
 End Sub
 
 Sub UpdatePic1()
-    Dim r As Range
-    Dim ws As Worksheet
     Dim imagePath As String
-    Dim img As Picture
     Dim folder As String
     Dim imagePath2 As String
     Dim a As Variant
     
-    Set ws = Worksheets("Pesquisa de Mercado")
-    
     imagePath = ActiveWorkbook.Path
-    
     a = Split(imagePath, "/")
-    folder = "C:/Users/tdoliveira/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/Laudos Creditas/" + a(8) + "/" + a(9)
+    
+    folder = "C:\Users\labreu\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\FIDC Wimo\" + a(8) + "\" + a(9)
     imagePath2 = folder + "\img\amostra1.png"
     
-    
-    If a(0) = "https:" Then
-        Set img = ws.Pictures.Insert(imagePath2)
-    Else
-        Set img = ws.Pictures.Insert(imagePath + "\img\amostra1.png")
-
-    End If
-    
-    With img
-    
-        .ShapeRange.LockAspectRatio = True
-        .Width = 100
-
-    End With
-
+    ActiveSheet.Pictures.Insert imagePath2
 End Sub
 
 Sub UpdatePic2()
-    Dim r As Range
-    Dim ws As Worksheet
     Dim imagePath As String
-    Dim img As Picture
     Dim folder As String
     Dim imagePath2 As String
     Dim a As Variant
     
-    Set ws = Worksheets("Pesquisa de Mercado")
-    
     imagePath = ActiveWorkbook.Path
-    
     a = Split(imagePath, "/")
-    folder = "C:/Users/tdoliveira/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/Laudos Creditas/" + a(8) + "/" + a(9)
+    
+    folder = "C:\Users\labreu\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\FIDC Wimo\" + a(8) + "\" + a(9)
     imagePath2 = folder + "\img\amostra2.png"
     
-    
-    If a(0) = "https:" Then
-        Set img = ws.Pictures.Insert(imagePath2)
-    Else
-        Set img = ws.Pictures.Insert(imagePath + "/img/amostra2.png")
-
-    End If
-    
-    With img
-    
-        .ShapeRange.LockAspectRatio = True
-        .Width = 100
-
-    End With
+    ActiveSheet.Pictures.Insert imagePath2
 
 End Sub
 
 Sub UpdatePic3()
-    Dim r As Range
-    Dim ws As Worksheet
     Dim imagePath As String
-    Dim img As Picture
     Dim folder As String
     Dim imagePath2 As String
     Dim a As Variant
     
-    Set ws = Worksheets("Pesquisa de Mercado")
-    
     imagePath = ActiveWorkbook.Path
-    
     a = Split(imagePath, "/")
-    folder = "C:/Users/tdoliveira/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/Laudos Creditas/" + a(8) + "/" + a(9)
+    
+    folder = "C:\Users\labreu\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\FIDC Wimo\" + a(8) + "\" + a(9)
     imagePath2 = folder + "\img\amostra3.png"
     
-    
-    If a(0) = "https:" Then
-        Set img = ws.Pictures.Insert(imagePath2)
-    Else
-        Set img = ws.Pictures.Insert(imagePath + "/img/amostra3.png")
-
-    End If
-    
-    With img
-    
-        .ShapeRange.LockAspectRatio = True
-        .Width = 100
-
-    End With
+    ActiveSheet.Pictures.Insert imagePath2
 
 End Sub
 
 Sub UpdatePic4()
-    Dim r As Range
-    Dim ws As Worksheet
     Dim imagePath As String
-    Dim img As Picture
     Dim folder As String
     Dim imagePath2 As String
     Dim a As Variant
     
-    Set ws = Worksheets("Pesquisa de Mercado")
-    
     imagePath = ActiveWorkbook.Path
-    
     a = Split(imagePath, "/")
-    folder = "C:/Users/tdoliveira/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/Laudos Creditas/" + a(8) + "/" + a(9)
+    
+    folder = "C:\Users\labreu\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\FIDC Wimo\" + a(8) + "\" + a(9)
     imagePath2 = folder + "\img\amostra4.png"
     
-    
-    If a(0) = "https:" Then
-        Set img = ws.Pictures.Insert(imagePath2)
-    Else
-        Set img = ws.Pictures.Insert(imagePath + "/img/amostra4.png")
-
-    End If
-    
-    With img
-    
-        .ShapeRange.LockAspectRatio = True
-        .Width = 100
-
-    End With
+    ActiveSheet.Pictures.Insert imagePath2
 
 End Sub
 
 Sub UpdatePic5()
-    Dim r As Range
-    Dim ws As Worksheet
     Dim imagePath As String
-    Dim img As Picture
     Dim folder As String
     Dim imagePath2 As String
     Dim a As Variant
     
-    Set ws = Worksheets("Pesquisa de Mercado")
-    
     imagePath = ActiveWorkbook.Path
-    
     a = Split(imagePath, "/")
-    folder = "C:/Users/tdoliveira/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/Laudos Creditas/" + a(8) + "/" + a(9)
+    
+    folder = "C:\Users\labreu\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\FIDC Wimo\" + a(8) + "\" + a(9)
     imagePath2 = folder + "\img\amostra5.png"
     
-    
-    If a(0) = "https:" Then
-        Set img = ws.Pictures.Insert(imagePath2)
-    Else
-        Set img = ws.Pictures.Insert(imagePath + "/img/amostra5.png")
-
-    End If
-    
-    With img
-    
-        .ShapeRange.LockAspectRatio = True
-        .Width = 100
-
-    End With
+    ActiveSheet.Pictures.Insert imagePath2
 
 End Sub
 
 Sub UpdatePic6()
-    Dim r As Range
-    Dim ws As Worksheet
     Dim imagePath As String
-    Dim img As Picture
     Dim folder As String
     Dim imagePath2 As String
     Dim a As Variant
     
-    Set ws = Worksheets("Pesquisa de Mercado")
-    
     imagePath = ActiveWorkbook.Path
-    
     a = Split(imagePath, "/")
-    folder = "C:/Users/tdoliveira/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/Laudos Creditas/" + a(8) + "/" + a(9)
+    
+    folder = "C:\Users\labreu\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\FIDC Wimo\" + a(8) + "\" + a(9)
     imagePath2 = folder + "\img\amostra6.png"
     
-    
-    If a(0) = "https:" Then
-        Set img = ws.Pictures.Insert(imagePath2)
-    Else
-        Set img = ws.Pictures.Insert(imagePath + "/img/amostra6.png")
-
-    End If
-    
-    With img
-    
-        .ShapeRange.LockAspectRatio = True
-        .Width = 100
-
-    End With
+    ActiveSheet.Pictures.Insert imagePath2
 
 End Sub
 
 
 Sub DownloadMap()
     Set fs = CreateObject("Scripting.FileSystemObject")
-    Set a = fs.CreateTextFile("C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_map\file.txt", True)
+    Set a = fs.CreateTextFile("C:\Users\labreu\Documents\automatizacao-laudos-python\get_map\file.txt", True)
+    a.WriteLine (ThisWorkbook.FullName)
+    a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("E22") & " " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("Q22") & ", " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("E23") & ", " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("E24"))
+    a.Close
+
+    Call Shell("cmd.exe /S /C" & """python C:\Users\labreu\Documents\automatizacao-laudos-python\get_map\main.py""", vbNormalFocus)
+End Sub
+
+
+Sub DownloadMapSamples()
+    Set fs = CreateObject("Scripting.FileSystemObject")
+    Set a = fs.CreateTextFile("C:\Users\labreu\Documents\automatizacao-laudos-python\get_map\file.txt", True)
     a.WriteLine (ThisWorkbook.FullName)
     a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("E22") & " " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("Q22") & ", " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("E23") & ", " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("E24"))
     a.WriteLine (ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q7") & ", " & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q8") & ", " & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AB8"))
@@ -360,38 +274,51 @@ Sub DownloadMap()
     a.WriteLine (ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q73") & ", " & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q74") & ", " & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AB74"))
     a.Close
 
-    Call Shell("cmd.exe /S /K" & """python C:\Users\tdoliveira\Documents\automatizacao-laudos-python\get_map\main.py""", vbNormalFocus)
+    Call Shell("cmd.exe /S /C" & """python C:\Users\labreu\Documents\automatizacao-laudos-python\get_map\main.py""", vbNormalFocus)
 End Sub
 
 Sub ImportMap()
-    Dim r As Range
     Dim ws As Worksheet
     Dim imagePath As String
     Dim folder As String
     Dim imagePath2 As String
     Dim a As Variant
-    
     Dim img As Picture
-    Set ws = Worksheets("Pesquisa de Mercado")
-    Set r = ws.Range("D7")
-    
+    Set ws = Worksheets("Descrição")
     
     imagePath = ActiveWorkbook.Path
     
     a = Split(imagePath, "/")
-    folder = "C:\Users\tdoliveira\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\Laudos Creditas\" + a(8) + "\" + a(9)
+    folder = "C:\Users\labreu\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\FIDC Wimo\" + a(8) + "\" + a(9)
     imagePath2 = folder + "\img\map.png"
-    
-    
-    If a(0) = "https:" Then
-        Set img = ws.Pictures.Insert(imagePath2)
-    Else
-        Set img = ws.Pictures.Insert(imagePath + "/img/map.png")
-
-    End If
+    Set img = ws.Pictures.Insert(imagePath2)
     
     With img
+        .ShapeRange.LockAspectRatio = True
+        .Width = 500
+
+    End With
+
+End Sub
+
+Sub ImportMapSamples()
+    Dim ws As Worksheet
+    Dim imagePath As String
+    Dim folder As String
+    Dim imagePath2 As String
+    Dim a As Variant
+    Dim img As Picture
+    Set ws = Worksheets("Pesquisa de Mercado")
     
+    imagePath = ActiveWorkbook.Path
+    
+    a = Split(imagePath, "/")
+    folder = "C:\Users\labreu\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\FIDC Wimo\" + a(8) + "\" + a(9)
+    imagePath2 = folder + "\img\map.png"
+    
+    Set img = ws.Pictures.Insert(imagePath2)
+    
+    With img
         .ShapeRange.LockAspectRatio = True
         .Width = 500
 
