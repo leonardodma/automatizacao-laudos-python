@@ -40,10 +40,6 @@ Sub UpdateData()
     folder = "C:/Users/labreu/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/FIDC Wimo/" + a(8) + "/" + a(9)
     DataFile2 = folder + "/dados_coletados.xlsx"
     
-    
-    ThisWorkbook.Worksheets("Dados Coletados").Range("F1").CurrentRegion.Clear
-    
-    
     If a(0) = "https:" Then
         Set OpenBook = Application.Workbooks.Open(DataFile2)
     Else
@@ -249,7 +245,6 @@ Sub UpdatePic6()
 
 End Sub
 
-
 Sub DownloadMap()
     Set fs = CreateObject("Scripting.FileSystemObject")
     Set a = fs.CreateTextFile("C:\Users\labreu\Documents\automatizacao-laudos-python\get_map\file.txt", True)
@@ -259,7 +254,6 @@ Sub DownloadMap()
 
     Call Shell("cmd.exe /S /C" & """python C:\Users\labreu\Documents\automatizacao-laudos-python\get_map\main.py""", vbNormalFocus)
 End Sub
-
 
 Sub DownloadMapSamples()
     Set fs = CreateObject("Scripting.FileSystemObject")
@@ -324,4 +318,49 @@ Sub ImportMapSamples()
 
     End With
 
+End Sub
+
+Sub SearchDistances()
+    Set fs = CreateObject("Scripting.FileSystemObject")
+    Set a = fs.CreateTextFile("C:\Users\labreu\Documents\automatizacao-laudos-python\get_distances\file.txt", True)
+    a.WriteLine (ThisWorkbook.FullName)
+    a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("E22") & " " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("Q22") & ", " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("E23") & ", " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("E24"))
+    a.Close
+
+    Call Shell("cmd.exe /S /C" & """python C:\Users\labreu\Documents\automatizacao-laudos-python\get_distances\main.py""", vbNormalFocus)
+End Sub
+
+Sub ImportDistances()
+    Dim OpenBook As Workbook
+    Dim DataFile As String
+    Dim folder As String
+    Dim DataFile2 As String
+    Dim a As Variant
+    Dim i As Integer
+    
+    DataFile = ActiveWorkbook.Path
+    
+    a = Split(DataFile, "/")
+    folder = "C:/Users/labreu/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/FIDC Wimo/" + a(8) + "/" + a(9)
+    DataFile2 = folder + "/locais_coletados.xlsx"
+    
+    If a(0) = "https:" Then
+        Set OpenBook = Application.Workbooks.Open(DataFile2)
+    Else
+        Set OpenBook = Application.Workbooks.Open(DataFile + "/locais_coletados.xlsx")
+    End If
+    
+    Range("D46:AH55").Select
+    Application.CutCopyMode = False
+    Selection.ClearContents
+    
+    For i = 2 To 12
+        ThisWorkbook.Worksheets("Descrição").Cells(44 + i, 4).Value = OpenBook.Sheets(1).Cells(i, 2).Value
+        ThisWorkbook.Worksheets("Descrição").Cells(44 + i, 28).Value = OpenBook.Sheets(1).Cells(i, 3).Value
+    Next i
+
+    OpenBook.Close False
+    
+    Application.ScreenUpdating = True
+    
 End Sub
