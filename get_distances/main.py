@@ -52,7 +52,6 @@ def export_places(address, report_path):
     planilha_path = barra + barra.join(planilha[7:-1])
     file_name = r'\locais_coletados.xlsx'
 
-
     save_path = user_path + \
                 str(r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis') + \
                 planilha_path + file_name

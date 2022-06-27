@@ -83,6 +83,8 @@ class Crawler():
                     if link_splited[4] == "casas":
                         URL = link
                         break
+                    
+        URL = "/".join(URL.split('/')[0:6])
 
         return URL
 
@@ -94,17 +96,33 @@ class Crawler():
 
         for link in google_results:
             URL = link
-            break
-
-        for link in google_results:
             link_splited = link.split('/')
+            if link_splited[3] == "venda":
+                break
 
-            if link_splited[3] == "venda" and link_splited[6] == "bairros":
-                link = "/".join(link_splited[0:7])
-                bairro_url = "-".join(unidecode(bairro.lower()).split(" "))
-                if self.tipo == "Casa Residencial":
-                    URL = f"{link}/{bairro_url}/casa_residencial/"
-                    break
+        try:
+            for link in google_results:
+                link_splited = link.split('/')
+
+                if link_splited[3] == "venda" and link_splited[6] == "bairros":
+                    link = "/".join(link_splited[0:7])
+                    bairro_url = "-".join(unidecode(bairro.lower()).split(" "))
+                    if self.tipo == "Casa Residencial":
+                        test_url = f"{link}/{bairro_url}/casa_residencial/"
+                        # Teste test_url
+                        page = self.session.get(test_url, headers={
+                            "User-Agent": str(ua.chrome)})
+                        soup = str(BeautifulSoup(
+                            page.content, 'html.parser'))
+                        dom = etree.HTML(str(soup))
+
+                        try:
+                            dom.xpath('//*[@id="js-site-main"]/div/h3')[0].text
+                        except:
+                            URL = test_url
+                            break
+        except:
+            pass
 
         return URL
 
