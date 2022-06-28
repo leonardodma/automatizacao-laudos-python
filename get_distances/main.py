@@ -1,6 +1,7 @@
 from googleplaces import GooglePlaces, types
 from geopy import GoogleV3, distance
 import pandas as pd
+from math import floor
 from pathlib import Path
 
 from credentials import MAPS_API_TOKEN
@@ -16,6 +17,21 @@ def get_lat_long(address):
     return latitude, longitude
 
 
+def format_string(string):
+    articles = ["a", "as", "e", "o", "os", "de", "das", "dos"]
+    string = string.lower()
+    string_splited = string.split(' ')
+    print(string_splited)
+    for i in range(len(string_splited)):
+        try:
+            if string_splited[i] not in articles:
+                string_splited[i] = string_splited[i][0].upper() + string_splited[i][1:]
+        except:
+            pass
+
+    return " ".join(string_splited)
+
+
 def export_places(address, report_path):
     radius = 2000
     places = []
@@ -23,8 +39,7 @@ def export_places(address, report_path):
 
     query_result = google_places.nearby_search(
             lat_lng={'lat': latitude, 'lng': longitude},
-            radius=radius,
-            types= [types.TYPE_HOSPITAL, types.TYPE_BANK, types.TYPE_GYM])
+            radius=radius)
 
     if query_result.has_attributions:
         print(query_result.html_attributions)
@@ -32,8 +47,8 @@ def export_places(address, report_path):
     for place in query_result.places:
         coords_1 = (latitude, longitude)
         coords_2 = (float(place.geo_location["lat"]), float(place.geo_location["lng"]))
-        distance_km = round(distance.geodesic(coords_1, coords_2).m, 2)
-        places.append((place.name, distance_km))
+        distance_km = 5 * floor(distance.geodesic(coords_1, coords_2).m/5)
+        places.append((format_string(place.name), distance_km))
 
     # Criando Dataframe
     df = pd.DataFrame(places, columns =['Local', 'Distância do Avaliado'])
