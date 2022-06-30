@@ -67,8 +67,8 @@ class Crawler():
         return neighbors
 
     def get_zap_imoveis_url(self, bairro):
-        URL = "https://www.zapimoveis.com.br/venda/apartamentos/"
-        query = f"{self.tipo} {bairro}, {self.municipio}, {self.uf}, Zap Imóveis"
+        query = f"{self.tipo} a venda em {bairro}, {self.municipio}, {self.uf}, Zap Imóveis"
+        print("\nPesquisando no Zap Imóveis: \n" + query)
 
         google_results = search(query, tld="co.in", num=10, stop=10)
 
@@ -83,14 +83,31 @@ class Crawler():
                     if link_splited[4] == "casas":
                         URL = link
                         break
-                    
+                if self.tipo == "Terreno":
+                    if link_splited[4] == "terrenos-lotes-condominios":
+                        URL = link
+                        break
+              
         URL = "/".join(URL.split('/')[0:6])
 
         return URL
+    
+    def test_url_viva(self, test_url):
+        page = self.session.get(test_url, headers={
+                            "User-Agent": str(ua.chrome)})
+        soup = str(BeautifulSoup(
+            page.content, 'html.parser'))
+        dom = etree.HTML(str(soup))
+
+        try:
+            dom.xpath('//*[@id="js-site-main"]/div/h3')[0].text
+            return False
+        except:
+            return True
 
     def get_viva_real_url(self, bairro):
-        URL = "https://www.vivareal.com.br/venda/"
-        query = f"{self.tipo} {bairro}, {self.municipio}, {self.uf}, Viva Real"
+        query = f"{self.tipo} a venda em {bairro}, {self.municipio}, {self.uf}, Viva Real"
+        print("\nPesquisando no Viva Real: \n" + query)
 
         google_results = search(query, tld="co.in", num=10, stop=10)
 
@@ -107,20 +124,16 @@ class Crawler():
                 if link_splited[3] == "venda" and link_splited[6] == "bairros":
                     link = "/".join(link_splited[0:7])
                     bairro_url = "-".join(unidecode(bairro.lower()).split(" "))
-                    if self.tipo == "Casa Residencial":
+                    if self.tipo == "Casa Residencial" or self.tipo == "Casa":
                         test_url = f"{link}/{bairro_url}/casa_residencial/"
-                        # Teste test_url
-                        page = self.session.get(test_url, headers={
-                            "User-Agent": str(ua.chrome)})
-                        soup = str(BeautifulSoup(
-                            page.content, 'html.parser'))
-                        dom = etree.HTML(str(soup))
-
-                        try:
-                            dom.xpath('//*[@id="js-site-main"]/div/h3')[0].text
-                        except:
+                        if self.test_url_viva(test_url):
                             URL = test_url
                             break
+                    if self.tipo == "Terreno":
+                        test_url = f"{link}/{bairro_url}/lote-terreno_comercial/"
+                        if self.test_url_viva(test_url):
+                            URL = test_url
+                            break             
         except:
             pass
 
@@ -133,17 +146,17 @@ class Crawler():
         for result in google_results:
             return result
 
-    def parse_zap_imoveis_data(self, soup, bairro):
+    def parse_zap_imoveis_data(self, soup):
         data_colected = []
         data = re.search(r'window.__INITIAL_STATE__=({.*})', soup).group(1)
-        data = json.loads(
-            "".join(data.split(";")[0:-3]))['results']["listings"]
+        data = json.loads("".join(data.split(";")[0:-3]))['results']["listings"]
 
         for i in range(len(data)):
             imovel = {}
             try:
                 rua = data[i]["listing"]["address"]["street"]
                 numero = int(data[i]["listing"]["address"]["streetNumber"])
+                bairro = data[i]["listing"]["address"]["neighborhood"]
                 if numero > 0:
                     area = int(data[i]["listing"]["usableAreas"][0])
                     quartos = int(data[i]["listing"]["bedrooms"][0])
@@ -170,7 +183,7 @@ class Crawler():
 
         return data_colected
 
-    def parse_viva_real_data(self, dom, bairro):
+    def parse_viva_real_data(self, dom):
         qtd = 1
         final = False
         while not final:
@@ -188,6 +201,7 @@ class Crawler():
                 full_address = dom.xpath(
                     f'/html/body/main/div[2]/div[1]/section/div[2]/div[1]/div[{i}]/div/article/a/div/h2/span[2]/span[1]')[0].text.strip()
                 address = full_address.split('-')[0].strip()
+                bairro = full_address.split('-')[1].split(',')[0].strip()
 
                 if int(address.split(',')[1].replace(" ", "")) != 0:
                     area = int(dom.xpath(
@@ -307,20 +321,24 @@ class Crawler():
             url_viva_real = self.get_viva_real_url(self.bairro)
 
             # Decidindo se vai ser uma pesquisa só no bairro ou também com os vizinhos
-            page = self.session.get(url_zap_imoveis, headers={
+            page = self.session.get(url_viva_real, headers={
                                     "User-Agent": str(ua.chrome)})
             soup = BeautifulSoup(page.content, 'html.parser')
             dom = etree.HTML(str(soup))
 
             # Determina a quantidade de anuncios
             anuncios = dom.xpath(
-                f'//*[@id="app"]/section[1]/div[1]/div[3]/section/header/div/h1/strong')[0].text.strip()
-            qtd_anuncios = int("".join(anuncios.split(" ")[0].split(".")))
+                f'//*[@id="js-site-main"]/div[2]/div[1]/section/header/div/div/div[1]/div/h1/strong')[0].text.strip()
+            qtd_anuncios = int("".join(anuncios.split(".")))
 
             # Começa a buscar as amostras
             data_colected = []
-            if qtd_anuncios >= 200:
-                for i in range(15):
+            if qtd_anuncios >= 300:
+                qtd_paginas = round(qtd_anuncios/36)
+                if qtd_paginas >= 15:
+                    qtd_paginas = 15
+
+                for i in range(qtd_paginas):
                     if i != 0:
                         search_url_zap = url_zap_imoveis+f"?pagina={i+1}"
                         search_url_viva = url_viva_real+f"?pagina={i+1}"
@@ -345,8 +363,8 @@ class Crawler():
                     dom = etree.HTML(str(soup_viva))
 
                     # Colect data
-                    data_colected += self.parse_zap_imoveis_data(soup_zap, self.bairro)
-                    data_colected += self.parse_viva_real_data(dom, self.bairro)
+                    data_colected += self.parse_zap_imoveis_data(soup_zap)
+                    data_colected += self.parse_viva_real_data(dom)
 
             else:
                 neighbors = self.get_neighbors()
@@ -385,8 +403,8 @@ class Crawler():
                         dom = etree.HTML(str(soup_viva))
 
                         # Colect data
-                        data_colected += self.parse_zap_imoveis_data(soup_zap, neighbor)
-                        data_colected += self.parse_viva_real_data(dom, neighbor)
+                        data_colected += self.parse_zap_imoveis_data(soup_zap)
+                        data_colected += self.parse_viva_real_data(dom)
         else:
             print("OBTENDO AMOSTRAS NO DF IMÓVEIS")
             url_df_imoveis = self.get_df_imoveis_url(self.bairro)
@@ -414,6 +432,8 @@ class Crawler():
         # Remove linhas com links repetidos
         df = df.drop_duplicates(subset=['link'])
         print("Removendo duplicados")
+
+        print(df)
 
         # Filtra um range de 15 m2 de diferença para a área do imóvel analisado
         df = df[df['area'] < self.area + 20]
