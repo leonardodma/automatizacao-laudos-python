@@ -70,7 +70,7 @@ class Crawler():
         query = f"{self.tipo} a venda em {bairro}, {self.municipio}, {self.uf}, Zap Imóveis"
         print("\nPesquisando no Zap Imóveis: \n" + query)
 
-        google_results = search(query, tld="co.in", num=10, stop=10)
+        google_results = search(query, tld="co.in", num=5, stop=5)
 
         for link in google_results:
             URL = link
@@ -109,7 +109,7 @@ class Crawler():
         query = f"{self.tipo} a venda em {bairro}, {self.municipio}, {self.uf}, Viva Real"
         print("\nPesquisando no Viva Real: \n" + query)
 
-        google_results = search(query, tld="co.in", num=10, stop=10)
+        google_results = search(query, tld="co.in", num=5, stop=5)
 
         for link in google_results:
             URL = link
@@ -141,45 +141,48 @@ class Crawler():
 
     def get_df_imoveis_url(self, bairro):
         query = f"{self.tipo} {bairro}, DF imóveis"
-        google_results = search(query, tld="co.in", num=10, stop=10)
+        google_results = search(query, tld="co.in", num=5, stop=5)
 
         for result in google_results:
             return result
 
     def parse_zap_imoveis_data(self, soup):
         data_colected = []
-        data = re.search(r'window.__INITIAL_STATE__=({.*})', soup).group(1)
-        data = json.loads("".join(data.split(";")[0:-3]))['results']["listings"]
+        try:
+            data = re.search(r'window.__INITIAL_STATE__=({.*})', soup).group(1)
+            data = json.loads("".join(data.split(";")[0:-3]))['results']["listings"]
 
-        for i in range(len(data)):
-            imovel = {}
-            try:
-                rua = data[i]["listing"]["address"]["street"]
-                numero = int(data[i]["listing"]["address"]["streetNumber"])
-                bairro = data[i]["listing"]["address"]["neighborhood"]
-                if numero > 0:
-                    area = int(data[i]["listing"]["usableAreas"][0])
-                    quartos = int(data[i]["listing"]["bedrooms"][0])
-                    banheiros = int(data[i]["listing"]["bathrooms"][0])
-                    vaga = int(data[i]["listing"]["parkingSpaces"][0])
-                    link = 'https://www.zapimoveis.com.br' + \
-                        data[i]["listing"]["link"]
+            for i in range(len(data)):
+                imovel = {}
+                try:
+                    rua = data[i]["listing"]["address"]["street"]
+                    numero = int(data[i]["listing"]["address"]["streetNumber"])
+                    bairro = data[i]["listing"]["address"]["neighborhood"]
+                    if numero > 0:
+                        area = int(data[i]["listing"]["usableAreas"][0])
+                        quartos = int(data[i]["listing"]["bedrooms"][0])
+                        banheiros = int(data[i]["listing"]["bathrooms"][0])
+                        vaga = int(data[i]["listing"]["parkingSpaces"][0])
+                        link = 'https://www.zapimoveis.com.br' + \
+                            data[i]["listing"]["link"]
 
-                    string_real = data[i]["listing"]["pricingInfo"]["price"]
-                    valor = int("".join(string_real.split(" ")[1].split(".")))
+                        string_real = data[i]["listing"]["pricingInfo"]["price"]
+                        valor = int("".join(string_real.split(" ")[1].split(".")))
 
-                    if len(string_real) > 0:
-                        imovel["endereco"] = f'{rua}, {numero}'
-                        imovel["bairro"] = bairro
-                        imovel["area"] = area
-                        imovel["quartos"] = quartos
-                        imovel["banheiros"] = banheiros
-                        imovel["vaga"] = vaga
-                        imovel["valor"] = valor
-                        imovel["link"] = link
-                        data_colected.append(imovel)
-            except:
-                pass
+                        if len(string_real) > 0:
+                            imovel["endereco"] = f'{rua}, {numero}'
+                            imovel["bairro"] = bairro
+                            imovel["area"] = area
+                            imovel["quartos"] = quartos
+                            imovel["banheiros"] = banheiros
+                            imovel["vaga"] = vaga
+                            imovel["valor"] = valor
+                            imovel["link"] = link
+                            data_colected.append(imovel)
+                except:
+                    pass
+        except:
+            pass
 
         return data_colected
 
