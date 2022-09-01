@@ -87,14 +87,14 @@ class Crawler():
                     if link_splited[4] == "terrenos-lotes-condominios":
                         URL = link
                         break
-              
+
         URL = "/".join(URL.split('/')[0:6])
 
         return URL
-    
+
     def test_url_viva(self, test_url):
         page = self.session.get(test_url, headers={
-                            "User-Agent": str(ua.chrome)})
+            "User-Agent": str(ua.chrome)})
         soup = str(BeautifulSoup(
             page.content, 'html.parser'))
         dom = etree.HTML(str(soup))
@@ -133,7 +133,7 @@ class Crawler():
                         test_url = f"{link}/{bairro_url}/lote-terreno_comercial/"
                         if self.test_url_viva(test_url):
                             URL = test_url
-                            break             
+                            break
         except:
             pass
 
@@ -150,7 +150,8 @@ class Crawler():
         data_colected = []
         try:
             data = re.search(r'window.__INITIAL_STATE__=({.*})', soup).group(1)
-            data = json.loads("".join(data.split(";")[0:-3]))['results']["listings"]
+            data = json.loads(
+                "".join(data.split(";")[0:-3]))['results']["listings"]
 
             for i in range(len(data)):
                 imovel = {}
@@ -167,7 +168,8 @@ class Crawler():
                             data[i]["listing"]["link"]
 
                         string_real = data[i]["listing"]["pricingInfo"]["price"]
-                        valor = int("".join(string_real.split(" ")[1].split(".")))
+                        valor = int(
+                            "".join(string_real.split(" ")[1].split(".")))
 
                         if len(string_real) > 0:
                             imovel["endereco"] = f'{rua}, {numero}'
@@ -434,19 +436,21 @@ class Crawler():
 
         # Remove linhas com links repetidos
         df = df.drop_duplicates(subset=['link'])
+        backup = df
         print("Removendo duplicados")
-
         print(df)
 
         # Filtra um range de 15 m2 de diferença para a área do imóvel analisado
         df = df[df['area'] < self.area + 20]
         df = df[df['area'] > self.area - 20]
         print("Filtrando as áreas")
-        
 
         # Deixa o mesmo endereço somente 3 vezes
         df = df.groupby(["endereco"]).head(3)
         print("Tirando endereços repetidos se houver mais de 3 ocorrências")
+
+        if len(df.index) < 6:
+            df = backup
 
         ############### Organizando as amostras ###############
         # Organiza as amostras pela proximidade da média de preços
