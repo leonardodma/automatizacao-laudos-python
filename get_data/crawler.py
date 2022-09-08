@@ -1,3 +1,5 @@
+import os
+from dotenv import dotenv_values
 import requests
 import json
 import pandas as pd
@@ -5,18 +7,22 @@ from geopy import GoogleV3
 import geog
 import shapely.geometry
 import numpy as np
-from credentials import MAPS_API_TOKEN
 from bs4 import BeautifulSoup
 import requests
 from lxml import etree
 from fake_useragent import UserAgent
 from pathlib import Path
 from unidecode import unidecode
-
-# Imports Bibliotecas Básicas
 import re
 import json
 from googlesearch import search
+
+env_path = str(os.path.dirname(os.path.realpath(__file__))).split(" \ "[1])
+env_path = " \ "[1].join(env_path[0:-1]) + " \ "[1] + ".env"
+
+# Secrets
+config = dict(dotenv_values(env_path))
+MAPS_API_TOKEN = config["MAPS_API_TOKEN"]
 
 ua = UserAgent()
 geolocator = GoogleV3(api_key=MAPS_API_TOKEN)

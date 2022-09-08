@@ -1,9 +1,4 @@
-# Imports 
-from operator import le
-from re import A
-from folium.map import Marker
-from numpy import number
-from credentials import MAPS_TOKEN
+# Imports
 from geopy import GoogleV3
 import folium
 from folium.plugins import MarkerCluster
@@ -14,14 +9,21 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from pathlib import Path
+from dotenv import dotenv_values
 
+env_path = str(os.path.dirname(os.path.realpath(__file__))).split(" \ "[1])
+env_path = " \ "[1].join(env_path[0:-1]) + " \ "[1] + ".env"
 
-# Chrome Driver 
+# Secrets
+config = dict(dotenv_values(env_path))
+MAPS_API_TOKEN = config["MAPS_API_TOKEN"]
+
+# Chrome Driver
 options = Options()
 options.add_argument("--start-maximized")
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-geolocator = GoogleV3(api_key=MAPS_TOKEN)
+geolocator = GoogleV3(api_key=MAPS_API_TOKEN)
 current_path = str(Path(__file__).parent.resolve())
 
 
@@ -34,14 +36,16 @@ def get_save_path(laudo_path):
     file_name = f'\\map.png'
 
     if img_path == str(r'\\img'):
-        save_path = barra.join(laudo_path.split(barra)[:-1]) + '\img' + file_name
+        save_path = barra.join(laudo_path.split(barra)[
+                               :-1]) + '\img' + file_name
         folder = barra.join(laudo_path.split(barra)[:-1]) + '\img'
     else:
-        save_path = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis') + img_path + file_name
-        folder = user_path + str(r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis') + img_path
+        save_path = user_path + \
+            str(r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis') + img_path + file_name
+        folder = user_path + \
+            str(r'\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis') + img_path
 
-
-    return save_path, folder 
+    return save_path, folder
 
 
 def get_informatios():
@@ -53,18 +57,18 @@ def get_informatios():
         laudo_path = informations[0]
         save_path, folder = get_save_path(laudo_path)
         imovel = informations[1] + ', Brazil'
-        
+
         if len(informations) > 2:
             for i in range(2, len(informations)):
                 x = informations[i].split(',')
                 try:
-                    address = " ".join([x[0].strip(), x[1].strip()]) + ', ' + x[2] + ', ' + x[3] + ', Brazil' 
+                    address = " ".join(
+                        [x[0].strip(), x[1].strip()]) + ', ' + x[2] + ', ' + x[3] + ', Brazil'
                 except:
-                    address = x[0].strip() + x[1] + x[2] + ', Brazil' 
+                    address = x[0].strip() + x[1] + x[2] + ', Brazil'
 
                 addresses.append(address)
 
-    
     return save_path, folder, imovel, addresses
 
 
@@ -80,7 +84,7 @@ def get_coordinates(addresses):
             coordinates.append((x.latitude, x.longitude))
         except:
             print(f'Não foi encontrado o seguinte erdereço: {addresses[i]}')
-    
+
     return coordinates
 
 
@@ -97,13 +101,14 @@ def split_duplicates(addresses):
 
 def export_map_html():
     m = folium.Map(get_main_location())
-    folium.Marker(location=get_main_location(), tooltip = imovel, icon=folium.Icon(color='red', icon='fas fa-home', prefix='fa')).add_to(m)
+    folium.Marker(location=get_main_location(), tooltip=imovel, icon=folium.Icon(
+        color='red', icon='fas fa-home', prefix='fa')).add_to(m)
 
     n = 1
 
     if len(addresses) > 0:
         marker_cluster = MarkerCluster()
-        coordinates =  get_coordinates(addresses)
+        coordinates = get_coordinates(addresses)
         duplicates = split_duplicates(coordinates)
         print(f'Itens duplicados: {duplicates}')
 
@@ -111,20 +116,22 @@ def export_map_html():
             icon_path = current_path+f'\\icons\\number-{n}.png'
             icon = folium.CustomIcon(icon_image=icon_path, icon_size=30)
             if point in duplicates:
-                folium.Marker(location=point, tooltip = n, icon=icon).add_to(marker_cluster)
+                folium.Marker(location=point, tooltip=n,
+                              icon=icon).add_to(marker_cluster)
             else:
-                folium.Marker(location=point, tooltip = n, icon=icon).add_to(m)
+                folium.Marker(location=point, tooltip=n, icon=icon).add_to(m)
 
             n += 1
-        
+
         marker_cluster.add_to(m)
-        
+
     m.fit_bounds(m.get_bounds())
     m.save(current_path+str(r'\map.html'))
 
 
 def export_map_png():
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    driver = webdriver.Chrome(service=Service(
+        ChromeDriverManager().install()), options=options)
     html_file = current_path + str(r"\map.html")
     driver.get("file:///" + html_file)
     time.sleep(4)

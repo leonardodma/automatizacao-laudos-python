@@ -1,7 +1,18 @@
 from crawler import *
 from pathlib import Path
 from geopy import GoogleV3
-from credentials import MAPS_API_TOKEN
+from dotenv import dotenv_values
+import os
+
+env_path = str(os.path.dirname(os.path.realpath(__file__))).split(" \ "[1])
+env_path = " \ "[1].join(env_path[0:-1]) + " \ "[1] + ".env"
+
+
+# Secrets
+config = dict(dotenv_values(env_path))
+MAPS_API_TOKEN = config["MAPS_API_TOKEN"]
+
+# Geolocator
 geolocator = GoogleV3(api_key=MAPS_API_TOKEN)
 
 
@@ -31,11 +42,11 @@ if __name__ == '__main__':
         except:
             area = int(float(".".join(informations[8].split(","))))
 
-
         # Planilha
         print(f'LAUDO: {laudo}')
-        
+
     search_address = f"{endereco}, {numero} - {bairro}, {municipio} - {uf}, {cep}"
     latitude, longitude = get_lat_long(search_address)
-    samples_crawler = Crawler(latitude, longitude, bairro, municipio, uf, area, tipo)
+    samples_crawler = Crawler(
+        latitude, longitude, bairro, municipio, uf, area, tipo)
     samples_crawler.export_data(laudo)
