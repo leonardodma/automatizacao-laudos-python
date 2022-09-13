@@ -1,7 +1,11 @@
+Function Username() As String
+    Username = Environ("Username")
+End Function
+
 Sub RunPython()
     Set fs = CreateObject("Scripting.FileSystemObject")
     'Set a = fs.CreateTextFile("R:\Empirica Cobrancas e Garantias\5 - Avaliacoes de Imoveis\automatizacao-laudos-python\get_data\file.txt", True).
-    Set a = fs.CreateTextFile("C:\Users\noliveira\Documents\automatizacao-laudos-python\get_data\file.txt", True)
+    Set a = fs.CreateTextFile("C:\Users\" + UserName() + "\Documents\automatizacao-laudos-python\get_data\file.txt", True)
     a.WriteLine (ThisWorkbook.FullName)
 
     'Endereco
@@ -23,7 +27,7 @@ Sub RunPython()
     a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("U32"))
     a.Close
     
-    Call Shell("cmd.exe /S /K" & """python C:\Users\noliveira\Documents\automatizacao-laudos-python\get_data\main.py""", vbNormalFocus)
+    Call Shell("cmd.exe /S /K" & """python C:\Users\" + UserName() + "\Documents\automatizacao-laudos-python\get_data\main.py""", vbNormalFocus)
 
 End Sub
 
@@ -37,7 +41,7 @@ Sub UpdateData()
     DataFile = ActiveWorkbook.Path
     
     a = Split(DataFile, "/")
-    folder = "C:/Users/noliveira/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/Keycash/" + a(8) + "/" + a(9)
+    folder = "C:/Users/" + UserName() + "/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/Keycash/" + a(8) + "/" + a(9)
     DataFile2 = folder + "/dados_coletados.xlsx"
     
     If a(0) = "https:" Then
@@ -56,17 +60,17 @@ End Sub
 
 Sub DownloadMap()
     Set fs = CreateObject("Scripting.FileSystemObject")
-    Set a = fs.CreateTextFile("C:\Users\noliveira\Documents\automatizacao-laudos-python\get_map\file.txt", True)
+    Set a = fs.CreateTextFile("C:\Users\" + UserName() + "\Documents\automatizacao-laudos-python\get_map\file.txt", True)
     a.WriteLine (ThisWorkbook.FullName)
     a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("E22") & " " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("Q22") & ", " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("D23") & ", " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("E24"))
     a.Close
 
-    Call Shell("cmd.exe /S /C" & """python C:\Users\noliveira\Documents\automatizacao-laudos-python\get_map\main.py""", vbNormalFocus)
+    Call Shell("cmd.exe /S /C" & """python C:\Users\" + UserName() + "\Documents\automatizacao-laudos-python\get_map\main.py""", vbNormalFocus)
 End Sub
 
 Sub DownloadMapSamples()
     Set fs = CreateObject("Scripting.FileSystemObject")
-    Set a = fs.CreateTextFile("C:\Users\noliveira\Documents\automatizacao-laudos-python\get_map\file.txt", True)
+    Set a = fs.CreateTextFile("C:\Users\" + UserName() + "\Documents\automatizacao-laudos-python\get_map\file.txt", True)
     a.WriteLine (ThisWorkbook.FullName)
     a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("E22") & " " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("Q22") & ", " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("D23") & ", " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("E24"))
     a.WriteLine (ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q7") & ", " & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q8") & ", " & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AB8"))
@@ -77,7 +81,7 @@ Sub DownloadMapSamples()
     a.WriteLine (ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q73") & ", " & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("Q74") & ", " & ThisWorkbook.Worksheets("Pesquisa de Mercado").Range("AB74"))
     a.Close
 
-    Call Shell("cmd.exe /S /C" & """python C:\Users\noliveira\Documents\automatizacao-laudos-python\get_map\main.py""", vbNormalFocus)
+    Call Shell("cmd.exe /S /C" & """python C:\Users\" + UserName() + "\Documents\automatizacao-laudos-python\get_map\main.py""", vbNormalFocus)
 End Sub
 
 Sub ImportMap()
@@ -92,7 +96,7 @@ Sub ImportMap()
     imagePath = ActiveWorkbook.Path
     
     a = Split(imagePath, "/")
-    folder = "C:\Users\noliveira\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\Keycash\" + a(8) + "\" + a(9)
+    folder = "C:\Users\" + UserName() + "\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\Keycash\" + a(8) + "\" + a(9)
     imagePath2 = folder + "\img\map.png"
     Set img = ws.Pictures.Insert(imagePath2)
     
@@ -116,7 +120,7 @@ Sub ImportMapSamples()
     imagePath = ActiveWorkbook.Path
     
     a = Split(imagePath, "/")
-    folder = "C:\Users\noliveira\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\Keycash\" + a(8) + "\" + a(9)
+    folder = "C:\Users\" + UserName() + "\Empírica Investimentos Gestão de Recursos Ltda\ESCO - Documentos\5 - Avaliacoes de Imoveis\Keycash\" + a(8) + "\" + a(9)
     imagePath2 = folder + "\img\map.png"
     
     Set img = ws.Pictures.Insert(imagePath2)
@@ -131,12 +135,12 @@ End Sub
 
 Sub SearchDistances()
     Set fs = CreateObject("Scripting.FileSystemObject")
-    Set a = fs.CreateTextFile("C:\Users\noliveira\Documents\automatizacao-laudos-python\get_distances\file.txt", True)
+    Set a = fs.CreateTextFile("C:\Users\" + UserName() + "\Documents\automatizacao-laudos-python\get_distances\file.txt", True)
     a.WriteLine (ThisWorkbook.FullName)
     a.WriteLine (ThisWorkbook.Worksheets("Modelo de Laudo").Range("E22") & " " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("Q22") & ", " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("D23") & ", " & ThisWorkbook.Worksheets("Modelo de Laudo").Range("E24"))
     a.Close
 
-    Call Shell("cmd.exe /S /C" & """python C:\Users\noliveira\Documents\automatizacao-laudos-python\get_distances\main.py""", vbNormalFocus)
+    Call Shell("cmd.exe /S /C" & """python C:\Users\" + UserName() + "\Documents\automatizacao-laudos-python\get_distances\main.py""", vbNormalFocus)
 End Sub
 
 Sub ImportDistances()
@@ -150,7 +154,7 @@ Sub ImportDistances()
     DataFile = ActiveWorkbook.Path
     
     a = Split(DataFile, "/")
-    folder = "C:/Users/noliveira/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/Keycash/" + a(8) + "/" + a(9)
+    folder = "C:/Users/" + UserName() + "/Empírica Investimentos Gestão de Recursos Ltda/ESCO - Documentos/5 - Avaliacoes de Imoveis/Keycash/" + a(8) + "/" + a(9)
     DataFile2 = folder + "/locais_coletados.xlsx"
     
     If a(0) = "https:" Then
